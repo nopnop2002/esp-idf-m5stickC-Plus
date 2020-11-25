@@ -29,7 +29,7 @@ It's possible to text rotation and invert.
 ![M5StickC-Plus-7](https://user-images.githubusercontent.com/6020549/100175724-48aac500-2f12-11eb-9329-d3ca8267432a.JPG)
 
 It's possible to indicate more than one font at the same time.   
-![M5StickC-Plus-10](https://user-images.githubusercontent.com/6020549/100175726-49435b80-2f12-11eb-99a2-ded8e71afba1.JPG)
+![M5StickC-Plus-11](https://user-images.githubusercontent.com/6020549/100176463-a986cd00-2f13-11eb-8a96-89a01ff7edbe.JPG)
 
 
 # Image support
