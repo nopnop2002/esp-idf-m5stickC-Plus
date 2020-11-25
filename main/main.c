@@ -10,6 +10,7 @@
 #include "esp_vfs.h"
 #include "esp_spiffs.h"
 
+#include "axp192.h"
 #include "st7789.h"
 #include "fontx.h"
 #include "bmpfile.h"
@@ -20,16 +21,16 @@
 #define WAIT	vTaskDelay(INTERVAL)
 
 // M5stickC-Plus stuff
-#define CONFIG_WIDTH      135
-#define CONFIG_HEIGHT     240
+#define CONFIG_WIDTH	  135
+#define CONFIG_HEIGHT	  240
 #define CONFIG_MOSI_GPIO  15
 #define CONFIG_SCLK_GPIO  13
-#define CONFIG_CS_GPIO    5 
-#define CONFIG_DC_GPIO    23
+#define CONFIG_CS_GPIO	  5 
+#define CONFIG_DC_GPIO	  23
 #define CONFIG_RESET_GPIO 18
-#define CONFIG_BL_GPIO    32
-#define CONFIG_OFFSETX    52
-#define CONFIG_OFFSETY    40
+#define CONFIG_BL_GPIO	  32
+#define CONFIG_OFFSETX	  52
+#define CONFIG_OFFSETY	  40
 
 
 static const char *TAG = "ST7789";
@@ -1050,5 +1051,12 @@ void app_main(void)
 	}
 
 	SPIFFS_Directory("/spiffs/");
+
+	// power on
+	i2c_master_init();
+	AXP192_PowerOn();
+	AXP192_ScreenBreath(11);
+
+	// Start Task
 	xTaskCreate(ST7789, "ST7789", 1024*6, NULL, 2, NULL);
 }
