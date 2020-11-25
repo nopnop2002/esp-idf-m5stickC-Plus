@@ -1,7 +1,7 @@
 # esp-idf-m5stickC-Plus
 Example code for driving M5StickC-Plus ST7789V2 display using ESP-IDF's SPI driver.
 
-![M5StickC-Plus-1](https://user-images.githubusercontent.com/6020549/100174258-6aef1380-2f0f-11eb-83d9-af3385b6949a.JPG)
+![M5StickC-Plus-1](https://user-images.githubusercontent.com/6020549/100175622-1a2cea00-2f12-11eb-8d3d-37aa5525856b.JPG)
 
 ```
 git clone https://github.com/nopnop2002/esp-idf-m5stickC-Plus
@@ -14,31 +14,31 @@ make flash
 
 
 # Graphic support
-![M5StickC-Plus-2](https://user-images.githubusercontent.com/6020549/100174338-91ad4a00-2f0f-11eb-9333-e501fdb5758b.JPG)
+![M5StickC-Plus-2](https://user-images.githubusercontent.com/6020549/100175648-26b14280-2f12-11eb-8cfd-3da7dba4ee78.JPG)
 
-![M5StickC-Plus-3](https://user-images.githubusercontent.com/6020549/100174339-9245e080-2f0f-11eb-98cf-870e170516d6.JPG)
+![M5StickC-Plus-3](https://user-images.githubusercontent.com/6020549/100175650-27e26f80-2f12-11eb-8d3b-cc5d52870b37.JPG)
 
-![M5StickC-Plus-4](https://user-images.githubusercontent.com/6020549/100174336-907c1d00-2f0f-11eb-8ea1-36f50047731d.JPG)
+![M5StickC-Plus-3](https://user-images.githubusercontent.com/6020549/100176075-fc13b980-2f12-11eb-8624-aa99c354d525.JPG)
 
 # Fonts support
 It's possible to text rotation and invert.   
-![M5StickC-Plus-5](https://user-images.githubusercontent.com/6020549/100174388-ab4e9180-2f0f-11eb-9528-18aa13add27a.JPG)
+![M5StickC-Plus-5](https://user-images.githubusercontent.com/6020549/100175720-45afd480-2f12-11eb-9acb-8d4244a2a910.JPG)
 
-![M5StickC-Plus-6](https://user-images.githubusercontent.com/6020549/100174391-ac7fbe80-2f0f-11eb-87da-3b4b752f79ac.JPG)
+![M5StickC-Plus-6](https://user-images.githubusercontent.com/6020549/100175721-46e10180-2f12-11eb-8cdb-cd4add269dcd.JPG)
 
-![M5StickC-Plus-7](https://user-images.githubusercontent.com/6020549/100174384-aa1d6480-2f0f-11eb-8fa2-7e86dc5575d1.JPG)
+![M5StickC-Plus-7](https://user-images.githubusercontent.com/6020549/100175724-48aac500-2f12-11eb-9329-d3ca8267432a.JPG)
 
 It's possible to indicate more than one font at the same time.   
-![M5StickC-Plus-11](https://user-images.githubusercontent.com/6020549/100174404-b4d7f980-2f0f-11eb-8bf6-01addd8b23e0.JPG)
+![M5StickC-Plus-10](https://user-images.githubusercontent.com/6020549/100175726-49435b80-2f12-11eb-99a2-ded8e71afba1.JPG)
 
 
 # Image support
 BMP file   
-![M5StickC-Plus-8](https://user-images.githubusercontent.com/6020549/100174487-e355d480-2f0f-11eb-96df-5ae2a33a22b7.JPG)
+![M5StickC-Plus-8](https://user-images.githubusercontent.com/6020549/100175767-5d875880-2f12-11eb-8cae-991e73e1f93b.JPG)
 JPEG file   
-![M5StickC-Plus-9](https://user-images.githubusercontent.com/6020549/100174489-e4870180-2f0f-11eb-8a37-b174608aef55.JPG)
+![M5StickC-Plus-9](https://user-images.githubusercontent.com/6020549/100175770-5eb88580-2f12-11eb-90d3-43d06675bb99.JPG)
 PNG file    
-![M5StickC-Plus-10](https://user-images.githubusercontent.com/6020549/100174484-e224a780-2f0f-11eb-9f51-b21f0d0d2716.JPG)
+![M5StickC-Plus-10](https://user-images.githubusercontent.com/6020549/100175773-5fe9b280-2f12-11eb-9043-55abc8e72a2e.JPG)
 
 
 # Font File   
