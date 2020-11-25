@@ -14,11 +14,11 @@ make flash
 
 
 # Graphic support
-![M5StickC-Plus-2](https://user-images.githubusercontent.com/6020549/100175648-26b14280-2f12-11eb-8cfd-3da7dba4ee78.JPG)
+![M5StickC-Plus-2](https://user-images.githubusercontent.com/6020549/100176342-73e1e400-2f13-11eb-9b03-0ec912228ce5.JPG)
 
-![M5StickC-Plus-3](https://user-images.githubusercontent.com/6020549/100175650-27e26f80-2f12-11eb-8d3b-cc5d52870b37.JPG)
+![M5StickC-Plus-3](https://user-images.githubusercontent.com/6020549/100176344-75131100-2f13-11eb-80f9-cf35e85fddef.JPG)
 
-![M5StickC-Plus-4](https://user-images.githubusercontent.com/6020549/100176214-38471a00-2f13-11eb-86d5-168b3b8d1b1e.JPG)
+![M5StickC-Plus-4](https://user-images.githubusercontent.com/6020549/100176347-76443e00-2f13-11eb-8e47-3b63f884062b.JPG)
 
 # Fonts support
 It's possible to text rotation and invert.   
