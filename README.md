@@ -18,7 +18,7 @@ make flash
 
 ![M5StickC-Plus-3](https://user-images.githubusercontent.com/6020549/100175650-27e26f80-2f12-11eb-8d3b-cc5d52870b37.JPG)
 
-![M5StickC-Plus-3](https://user-images.githubusercontent.com/6020549/100176075-fc13b980-2f12-11eb-8624-aa99c354d525.JPG)
+![M5StickC-Plus-4](https://user-images.githubusercontent.com/6020549/100176214-38471a00-2f13-11eb-86d5-168b3b8d1b1e.JPG)
 
 # Fonts support
 It's possible to text rotation and invert.   
