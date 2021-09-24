@@ -28,7 +28,7 @@
 #define CONFIG_CS_GPIO	  5 
 #define CONFIG_DC_GPIO	  23
 #define CONFIG_RESET_GPIO 18
-#define CONFIG_BL_GPIO	  32
+#define CONFIG_BL_GPIO	  -1
 #define CONFIG_OFFSETX	  52
 #define CONFIG_OFFSETY	  40
 
