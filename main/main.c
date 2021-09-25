@@ -870,6 +870,10 @@ void ST7789(void *pvParameters)
 		BMPTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
 
+		strcpy(file, "/spiffs/esp32_135.bmp");
+		BMPTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
+		WAIT;
+
 		strcpy(file, "/spiffs/esp32.jpeg");
 		JPEGTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
@@ -941,7 +945,8 @@ void ST7789(void *pvParameters)
 		WAIT;
 
 		char file[32];
-		strcpy(file, "/spiffs/image.bmp");
+		//strcpy(file, "/spiffs/image.bmp");
+		strcpy(file, "/spiffs/esp32_135.bmp");
 		BMPTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
 
@@ -1023,7 +1028,7 @@ void app_main(void)
 	esp_vfs_spiffs_conf_t conf = {
 		.base_path = "/spiffs",
 		.partition_label = NULL,
-		.max_files = 8,
+		.max_files = 10,
 		.format_if_mount_failed =true
 	};
 
