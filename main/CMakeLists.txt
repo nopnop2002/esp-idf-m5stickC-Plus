@@ -1,4 +1,10 @@
-set(COMPONENT_SRCS main.c st7789.c axp192.c fontx.c decode_image.c pngle.c)
-set(COMPONENT_ADD_INCLUDEDIRS ".")
+set(srcs "main.c"
+	"st7789.c"
+	"axp192.c"
+	"fontx.c"
+	"decode_jpeg.c"
+	"decode_png.c"
+	"pngle.c"
+	)
 
-register_component()
+idf_component_register(SRCS ${srcs} INCLUDE_DIRS ".")
