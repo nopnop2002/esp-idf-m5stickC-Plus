@@ -4,7 +4,7 @@ Example code for driving M5StickC-Plus ST7789V2 display using ESP-IDF's SPI driv
 ![M5StickC-Plus-1](https://user-images.githubusercontent.com/6020549/100175622-1a2cea00-2f12-11eb-8d3d-37aa5525856b.JPG)
 
 # Software requirements
-esp-idf v4.4/v5.0.   
+esp-idf v4.4/v5.x.   
 
 # How to build
 ```
