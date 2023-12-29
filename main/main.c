@@ -447,7 +447,7 @@ TickType_t FillRectTest(TFT_t * dev, int width, int height) {
 		red=rand()%255;
 		green=rand()%255;
 		blue=rand()%255;
-		color=rgb565_conv(red, green, blue);
+		color=rgb565(red, green, blue);
 		uint16_t xpos=rand()%width;
 		uint16_t ypos=rand()%height;
 		uint16_t size=rand()%(width/5);
@@ -617,7 +617,7 @@ TickType_t BMPTest(TFT_t * dev, char * file, int width, int height) {
 				uint8_t b = sdbuffer[buffidx++];
 				uint8_t g = sdbuffer[buffidx++];
 				uint8_t r = sdbuffer[buffidx++];
-				colors[index++] = rgb565_conv(r, g, b);
+				colors[index++] = rgb565(r, g, b);
 			} // end for col
 			ESP_LOGD(__FUNCTION__,"lcdDrawMultiPixels _x=%d _y=%d row=%d",_x, _y, row);
 			//lcdDrawMultiPixels(dev, _x, row+_y, _w, colors);
@@ -677,7 +677,7 @@ TickType_t JPEGTest(TFT_t * dev, char * file, int width, int height) {
 		for(int y = 0; y < jpegHeight; y++){
 			for(int x = 0;x < jpegWidth; x++){
 				pixel_s pixel = pixels[y][x];
-				uint16_t color = rgb565_conv(pixel.red, pixel.green, pixel.blue);
+				uint16_t color = rgb565(pixel.red, pixel.green, pixel.blue);
 				lcdDrawPixel(dev, x+offsetX, y+offsetY, color);
 			}
 			vTaskDelay(1);
@@ -687,7 +687,7 @@ TickType_t JPEGTest(TFT_t * dev, char * file, int width, int height) {
 		for(int y = 0; y < jpegHeight; y++){
 			for(int x = 0;x < jpegWidth; x++){
 				//pixel_s pixel = pixels[y][x];
-				//colors[x] = rgb565_conv(pixel.red, pixel.green, pixel.blue);
+				//colors[x] = rgb565(pixel.red, pixel.green, pixel.blue);
 				colors[x] = pixels[y][x];
 			}
 			lcdDrawMultiPixels(dev, offsetX, y+offsetY, jpegWidth, colors);
@@ -790,7 +790,7 @@ TickType_t PNGTest(TFT_t * dev, char * file, int width, int height) {
 	for(int y = 0; y < pngHeight; y++){
 		for(int x = 0;x < pngWidth; x++){
 			pixel_png pixel = pngle->pixels[y][x];
-			uint16_t color = rgb565_conv(pixel.red, pixel.green, pixel.blue);
+			uint16_t color = rgb565(pixel.red, pixel.green, pixel.blue);
 			lcdDrawPixel(dev, x+offsetX, y+offsetY, color);
 		}
 	}
@@ -799,7 +799,7 @@ TickType_t PNGTest(TFT_t * dev, char * file, int width, int height) {
 	for(int y = 0; y < pngHeight; y++){
 		for(int x = 0;x < pngWidth; x++){
 			//pixel_png pixel = pngle->pixels[y][x];
-			//colors[x] = rgb565_conv(pixel.red, pixel.green, pixel.blue);
+			//colors[x] = rgb565(pixel.red, pixel.green, pixel.blue);
 			colors[x] = pngle->pixels[y][x];
 		}
 		lcdDrawMultiPixels(dev, offsetX, y+offsetY, pngWidth, colors);
