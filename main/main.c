@@ -10,8 +10,10 @@
 #include "esp_system.h"
 #include "esp_vfs.h"
 #include "esp_spiffs.h"
+#include <driver/gpio.h>
 
 #include "axp192.h"
+#include "Light_PWM.h"
 #include "st7789.h"
 #include "fontx.h"
 #include "bmpfile.h"
@@ -23,6 +25,7 @@
 #define WAIT vTaskDelay(INTERVAL)
 
 // M5stickC-Plus stuff
+#if CONFIG_M5STICK_C_PLUS
 #define CONFIG_WIDTH 135
 #define CONFIG_HEIGHT 240
 #define CONFIG_MOSI_GPIO 15
@@ -31,11 +34,27 @@
 #define CONFIG_DC_GPIO 23
 #define CONFIG_RESET_GPIO 18
 #define CONFIG_BL_GPIO -1
+#define CONFIG_LED_GPIO 10
 #define CONFIG_OFFSETX 52
 #define CONFIG_OFFSETY 40
+#endif
 
+// M5stickC-Plus2 stuff
+#if CONFIG_M5STICK_C_PLUS2
+#define CONFIG_WIDTH 135
+#define CONFIG_HEIGHT 240
+#define CONFIG_MOSI_GPIO 15
+#define CONFIG_SCLK_GPIO 13
+#define CONFIG_CS_GPIO 5 
+#define CONFIG_DC_GPIO 14
+#define CONFIG_RESET_GPIO 12
+#define CONFIG_BL_GPIO -1
+#define CONFIG_LED_GPIO 19
+#define CONFIG_OFFSETX 52
+#define CONFIG_OFFSETY 40
+#endif
 
-static const char *TAG = "ST7789";
+static const char *TAG = "MAIN";
 
 static void SPIFFS_Directory(char * path) {
 	DIR* dir = opendir(path);
@@ -842,21 +861,7 @@ void ST7789(void *pvParameters)
 
 #if 0
 	while (1) {
-		char file[32];
-		strcpy(file, "/spiffs/image.bmp");
-		BMPTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
-		WAIT;
-
-		strcpy(file, "/spiffs/esp32_135.bmp");
-		BMPTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
-		WAIT;
-
-		strcpy(file, "/spiffs/esp32.jpeg");
-		JPEGTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
-		WAIT;
-
-		strcpy(file, "/spiffs/esp_logo.png");
-		PNGTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
+		ArrowTest(&dev, fx16G, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
 	}
 #endif
@@ -1034,10 +1039,28 @@ void app_main(void)
 
 	SPIFFS_Directory("/spiffs/");
 
+#if CONFIG_M5STICK_C_PLUS
 	// power on
 	i2c_master_init();
 	AXP192_PowerOn();
 	AXP192_ScreenBreath(11);
+#endif
+
+#if CONFIG_M5STICK_C_PLUS2
+	// power hold
+	#define POWER_HOLD_GPIO 4
+	gpio_reset_pin( POWER_HOLD_GPIO );
+	gpio_set_direction( POWER_HOLD_GPIO, GPIO_MODE_OUTPUT );
+	gpio_set_level( POWER_HOLD_GPIO, 1 );
+	// screen on
+	Light_PWM_init(295);
+#endif
+
+#if 0
+	gpio_reset_pin( CONFIG_LED_GPIO );
+	gpio_set_direction( CONFIG_LED_GPIO, GPIO_MODE_OUTPUT );
+	gpio_set_level( CONFIG_LED_GPIO, 1 );
+#endif
 
 	// Start Task
 	xTaskCreate(ST7789, "ST7789", 1024*6, NULL, 2, NULL);

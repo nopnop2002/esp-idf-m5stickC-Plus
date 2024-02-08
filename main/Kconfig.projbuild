@@ -1,0 +1,18 @@
+menu "M5Stick-C Plus Configuration"
+
+	choice DEVICE_SELECT
+		prompt "M5STICK_C_PLUS/M5STICK_C_PLUS2"
+		default M5STICK_C_PLUS
+		help
+			Select SPI peripheral that controls this bus.
+		config M5STICK_C_PLUS
+			bool "M5STICK_C_PLUS"
+			help
+				Device is M5STICK_C_PLUS.
+		config M5STICK_C_PLUS2
+			bool "M5STICK_C_PLUS2"
+			help
+				Device is M5STICK_C_PLUS2.
+	endchoice
+
+endmenu

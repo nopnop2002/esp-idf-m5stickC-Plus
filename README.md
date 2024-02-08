@@ -1,12 +1,12 @@
 # esp-idf-m5stickC-Plus
-Example code for driving M5StickC-Plus ST7789V2 display using ESP-IDF's SPI driver.
+Example code for driving M5StickC-Plus/Plus2 ST7789V2 display using ESP-IDF's SPI driver.
 
-![M5StickC-Plus-1](https://user-images.githubusercontent.com/6020549/100175622-1a2cea00-2f12-11eb-8d3d-37aa5525856b.JPG)
+![M5StickC-Plus2](https://github.com/nopnop2002/esp-idf-m5stickC-Plus/assets/6020549/ca0e2687-a557-40b5-b712-5f3f578ddf75)
 
 # Software requirements
 esp-idf v4.4/v5.x.   
 
-# How to build
+# Installation
 ```
 git clone https://github.com/nopnop2002/esp-idf-m5stickC-Plus
 cd esp-idf-m5stickC-Plus/
@@ -15,9 +15,14 @@ idf.py menuconfig
 idf.py flash -b 115200 monitor
 ```
 
-\*There is no MENU ITEM where this application is peculiar.   
-
 __You need to specify Baud rate for flashing.__   
+
+
+# Configuration
+![config-top](https://github.com/nopnop2002/esp-idf-m5stickC-Plus/assets/6020549/143cc5c4-0265-42b2-93eb-3f11aa0d4cb0)
+![config-app-1](https://github.com/nopnop2002/esp-idf-m5stickC-Plus/assets/6020549/1b00b76d-bca2-424d-86f1-1ef27b56b96c)
+![config-app-2](https://github.com/nopnop2002/esp-idf-m5stickC-Plus/assets/6020549/d717051b-74aa-4453-afbd-bac6f418227c)
+
 
 # Graphic support
 ![M5StickC-Plus-2](https://user-images.githubusercontent.com/6020549/100176342-73e1e400-2f13-11eb-9b03-0ec912228ce5.JPG)

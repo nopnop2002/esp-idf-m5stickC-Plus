@@ -1,5 +1,6 @@
 set(srcs "main.c"
 	"st7789.c"
+	"Light_PWM.c"
 	"axp192.c"
 	"fontx.c"
 	"decode_jpeg.c"
