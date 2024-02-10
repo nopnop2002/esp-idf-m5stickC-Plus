@@ -7,13 +7,12 @@
 #include "freertos/task.h"
 #include "esp_err.h"
 #include "esp_log.h"
-#include "esp_system.h"
 #include "esp_vfs.h"
 #include "esp_spiffs.h"
-#include <driver/gpio.h>
+#include "driver/gpio.h"
 
 #include "axp192.h"
-#include "Light_PWM.h"
+#include "sgm2578.h"
 #include "st7789.h"
 #include "fontx.h"
 #include "bmpfile.h"
@@ -55,17 +54,6 @@
 #endif
 
 static const char *TAG = "MAIN";
-
-static void SPIFFS_Directory(char * path) {
-	DIR* dir = opendir(path);
-	assert(dir != NULL);
-	while (true) {
-		struct dirent*pe = readdir(dir);
-		if (!pe) break;
-		ESP_LOGI(__FUNCTION__,"d_name=%s d_ino=%d d_type=%x", pe->d_name,pe->d_ino, pe->d_type);
-	}
-	closedir(dir);
-}
 
 TickType_t FillTest(TFT_t * dev, int width, int height) {
 	TickType_t startTick, endTick, diffTick;
@@ -833,22 +821,39 @@ TickType_t PNGTest(TFT_t * dev, char * file, int width, int height) {
 	return diffTick;
 }
 
-void ST7789(void *pvParameters)
+void tft(void *pvParameters)
 {
+#if CONFIG_M5STICK_C_PLUS
+	// power on
+	AXP192_PowerOn();
+	AXP192_ScreenBreath(11);
+#endif
+
+#if CONFIG_M5STICK_C_PLUS2
+	// power hold
+	#define POWER_HOLD_GPIO 4
+	gpio_reset_pin( POWER_HOLD_GPIO );
+	gpio_set_direction( POWER_HOLD_GPIO, GPIO_MODE_OUTPUT );
+	gpio_set_level( POWER_HOLD_GPIO, 1 );
+	// Enable SGM2578. VLED is supplied by SGM2578
+	#define SGM2578_ENABLE_GPIO 27
+	sgm2578_Enable(SGM2578_ENABLE_GPIO);
+#endif
+
 	// set font file
 	FontxFile fx16G[2];
 	FontxFile fx24G[2];
 	FontxFile fx32G[2];
-	InitFontx(fx16G,"/spiffs/ILGH16XB.FNT",""); // 8x16Dot Gothic
-	InitFontx(fx24G,"/spiffs/ILGH24XB.FNT",""); // 12x24Dot Gothic
-	InitFontx(fx32G,"/spiffs/ILGH32XB.FNT",""); // 16x32Dot Gothic
+	InitFontx(fx16G,"/fonts/ILGH16XB.FNT",""); // 8x16Dot Gothic
+	InitFontx(fx24G,"/fonts/ILGH24XB.FNT",""); // 12x24Dot Gothic
+	InitFontx(fx32G,"/fonts/ILGH32XB.FNT",""); // 16x32Dot Gothic
 
 	FontxFile fx16M[2];
 	FontxFile fx24M[2];
 	FontxFile fx32M[2];
-	InitFontx(fx16M,"/spiffs/ILMH16XB.FNT",""); // 8x16Dot Mincyo
-	InitFontx(fx24M,"/spiffs/ILMH24XB.FNT",""); // 12x24Dot Mincyo
-	InitFontx(fx32M,"/spiffs/ILMH32XB.FNT",""); // 16x32Dot Mincyo
+	InitFontx(fx16M,"/fonts/ILMH16XB.FNT",""); // 8x16Dot Mincyo
+	InitFontx(fx24M,"/fonts/ILMH24XB.FNT",""); // 12x24Dot Mincyo
+	InitFontx(fx32M,"/fonts/ILMH32XB.FNT",""); // 16x32Dot Mincyo
 	
 	TFT_t dev;
 	spi_master_init(&dev, CONFIG_MOSI_GPIO, CONFIG_SCLK_GPIO, CONFIG_CS_GPIO, CONFIG_DC_GPIO, CONFIG_RESET_GPIO, CONFIG_BL_GPIO);
@@ -927,16 +932,16 @@ void ST7789(void *pvParameters)
 		WAIT;
 
 		char file[32];
-		//strcpy(file, "/spiffs/image.bmp");
-		strcpy(file, "/spiffs/esp32_135.bmp");
+		//strcpy(file, "/images/image.bmp");
+		strcpy(file, "/images/esp32_135.bmp");
 		BMPTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
 
-		strcpy(file, "/spiffs/esp32.jpeg");
+		strcpy(file, "/images/esp32.jpeg");
 		JPEGTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
 
-		strcpy(file, "/spiffs/esp_logo.png");
+		strcpy(file, "/images/esp_logo.png");
 		PNGTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
 
@@ -1002,21 +1007,18 @@ void ST7789(void *pvParameters)
 	}
 }
 
-
-void app_main(void)
-{
+esp_err_t mountSPIFFS(char * partition_label, char * mount_point) {
 	ESP_LOGI(TAG, "Initializing SPIFFS");
-
 	esp_vfs_spiffs_conf_t conf = {
-		.base_path = "/spiffs",
-		.partition_label = NULL,
-		.max_files = 10,
-		.format_if_mount_failed =true
+		.base_path = mount_point,
+		.partition_label = partition_label,
+		.max_files = 10, // maximum number of files which can be open at the same time
+		.format_if_mount_failed = true
 	};
 
-	// Use settings defined above toinitialize and mount SPIFFS filesystem.
-	// Note: esp_vfs_spiffs_register is anall-in-one convenience function.
-	esp_err_t ret =esp_vfs_spiffs_register(&conf);
+	// Use settings defined above to initialize and mount SPIFFS filesystem.
+	// Note: esp_vfs_spiffs_register is an all-in-one convenience function.
+	esp_err_t ret = esp_vfs_spiffs_register(&conf);
 
 	if (ret != ESP_OK) {
 		if (ret == ESP_FAIL) {
@@ -1024,44 +1026,67 @@ void app_main(void)
 		} else if (ret == ESP_ERR_NOT_FOUND) {
 			ESP_LOGE(TAG, "Failed to find SPIFFS partition");
 		} else {
-			ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)",esp_err_to_name(ret));
+			ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
 		}
-		return;
+		return ret;
 	}
 
 	size_t total = 0, used = 0;
-	ret = esp_spiffs_info(NULL, &total,&used);
+	//ret = esp_spiffs_info(NULL, &total, &used);
+	ret = esp_spiffs_info(partition_label, &total, &used);
 	if (ret != ESP_OK) {
-		ESP_LOGE(TAG,"Failed to get SPIFFS partition information (%s)",esp_err_to_name(ret));
+		ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
 	} else {
-		ESP_LOGI(TAG,"Partition size: total: %d, used: %d", total, used);
+		ESP_LOGI(TAG, "Partition [%s] size: total: %d, used: %d", mount_point, total, used);
 	}
+	return ret;
+}
 
-	SPIFFS_Directory("/spiffs/");
+static int getFileSize(char *fullPath) {
+	struct stat st;
+	if (stat(fullPath, &st) == 0)
+		return st.st_size;
+	return -1;
+}
 
-#if CONFIG_M5STICK_C_PLUS
-	// power on
+static void printDirectory(char * path) {
+	DIR* dir = opendir(path);
+	assert(dir != NULL);
+	while (true) {
+		struct dirent *pe = readdir(dir);
+		if (!pe) break;
+		if (pe->d_type == 1) {
+			char fullPath[64];
+			strcpy(fullPath, path);
+			strcat(fullPath, "/");
+			strcat(fullPath, pe->d_name);
+			int fsize = getFileSize(fullPath);
+			ESP_LOGI(__FUNCTION__,"%s d_name=%s d_ino=%d fsize=%d", path, pe->d_name, pe->d_ino, fsize);
+		}
+		if (pe->d_type == 2) {
+			char subDir[127];
+			sprintf(subDir,"%s%.64s", path, pe->d_name);
+			ESP_LOGI(TAG, "subDir=[%s]", subDir);
+			printDirectory(subDir);
+
+		}
+	}
+	closedir(dir);
+}
+
+
+void app_main(void)
+{
+	// Mount SPIFFS File System on FLASH
+	ESP_LOGI(TAG, "Initializing SPIFFS");
+	ESP_ERROR_CHECK(mountSPIFFS("storage1", "/fonts"));
+	printDirectory("/fonts");
+	ESP_ERROR_CHECK(mountSPIFFS("storage2", "/images"));
+	printDirectory("/images");
+
+	// Initialize i2c
 	i2c_master_init();
-	AXP192_PowerOn();
-	AXP192_ScreenBreath(11);
-#endif
-
-#if CONFIG_M5STICK_C_PLUS2
-	// power hold
-	#define POWER_HOLD_GPIO 4
-	gpio_reset_pin( POWER_HOLD_GPIO );
-	gpio_set_direction( POWER_HOLD_GPIO, GPIO_MODE_OUTPUT );
-	gpio_set_level( POWER_HOLD_GPIO, 1 );
-	// screen on
-	Light_PWM_init(295);
-#endif
-
-#if 0
-	gpio_reset_pin( CONFIG_LED_GPIO );
-	gpio_set_direction( CONFIG_LED_GPIO, GPIO_MODE_OUTPUT );
-	gpio_set_level( CONFIG_LED_GPIO, 1 );
-#endif
 
 	// Start Task
-	xTaskCreate(ST7789, "ST7789", 1024*6, NULL, 2, NULL);
+	xTaskCreate(tft, "TFT", 1024*6, NULL, 2, NULL);
 }

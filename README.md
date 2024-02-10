@@ -9,7 +9,7 @@ esp-idf v4.4/v5.x.
 # Installation
 ```
 git clone https://github.com/nopnop2002/esp-idf-m5stickC-Plus
-cd esp-idf-m5stickC-Plus/
+cd esp-idf-m5stickC-Plus/screen
 idf.py set-target esp32
 idf.py menuconfig
 idf.py flash -b 115200 monitor
