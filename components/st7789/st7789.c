@@ -5,9 +5,8 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
-#include <driver/spi_master.h>
-#include <driver/gpio.h>
+#include "driver/spi_master.h"
+#include "driver/gpio.h"
 #include "esp_log.h"
 
 #include "st7789.h"
