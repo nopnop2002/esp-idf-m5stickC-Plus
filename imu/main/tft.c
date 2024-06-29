@@ -123,17 +123,17 @@ void tft(void *pvParameters)
 					xdelta=0.0;
 					xpos=10.0;
 				}
-			    ydelta += motion6.accY * 10.0;
-   				ypos += ydelta;
+				ydelta += motion6.accY * 10.0;
+				ypos += ydelta;
 				ESP_LOGD(TAG, "ydelta=%f ypos=%d", ydelta, ypos);
-   		 		if(ypos>=height-10) {
-			        ydelta=0.0;
-   	    		 ypos=height-10;
-			    }
-			    if(ypos<=10.0) {
-   		    		 ydelta=0.0;
-			        ypos=10.0;
-   		 		}
+				if(ypos>=height-10) {
+					ydelta=0.0;
+					ypos=height-10;
+				}
+				if(ypos<=10.0) {
+					ydelta=0.0;
+					ypos=10.0;
+				}
 	
 				lcdDrawCircle(&dev, xpos, ypos, 10, colors[color_index]);
 			} // from imu
