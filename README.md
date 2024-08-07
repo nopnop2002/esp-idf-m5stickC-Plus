@@ -60,13 +60,52 @@ Your font file is uploaded to SPIFFS partition using meke flash.
 
 Please refer [this](http://elm-chan.org/docs/dosv/fontx_e.html) page about FONTX format.   
 
+# Convert from TTF font to FONTX font  
+step1)   
+Download WFONTX64.exe from [here](https://github.com/nemuisan/WFONTX64/releases).
+Developer page is [here](https://github.com/nemuisan/WFONTX64).   
+
+step2)   
+Select ttf font.   
+![WFONTX64-1](https://github.com/user-attachments/assets/2193a3c4-021c-48e6-8486-2ce500bdac36)
+
+step3)   
+Enter Height, Width, FontX2 name.   
+Specify half of Height for Width.   
+Specify your favorite font name in the FontX2 name field using up to 8 characters.   
+![WFONTX64-2](https://github.com/user-attachments/assets/c87a9ec9-8e28-4d34-8475-60b15a47fb22)
+
+
+step4)   
+Specify the file name to save.   
+![WFONTX64-3](https://github.com/user-attachments/assets/9715d4bf-e460-41a6-9a4b-38c0f10020f7)
+
+step5)   
+Specify the font style as required.   
+![WFONTX64-4](https://github.com/user-attachments/assets/0ff3072d-6a78-48ae-b855-60c692f8d771)
+
+step6)   
+Press the RUN button to convert TTF fonts to FONTX format.   
+![WFONTX64-5](https://github.com/user-attachments/assets/d9797e3d-1fd6-4504-b161-c1280f1242c0)
+
+step7)   
+upload your font file to $HOME/esp-idf-m5stickC/font directory.   
+
+step8)   
+add font to use   
 ```
-FontxFile yourFont[2];
-InitFontx(yourFont,"/spiffs/your_font_file_name","");
-uint8_t ascii[10];
-strcpy((char *)ascii, "MyFont");
-lcdDrawString(dev, yourFont, x, y, ascii, color);
+    FontxFile fx16G[2];
+    FontxFile fx24G[2];
+    FontxFile fx32G[2];
+    //InitFontx(fx16G,"/fonts/ILGH16XB.FNT",""); // 8x16Dot Gothic
+    //InitFontx(fx24G,"/fonts/ILGH24XB.FNT",""); // 12x24Dot Gothic
+    //InitFontx(fx32G,"/fonts/ILGH32XB.FNT",""); // 16x32Dot Gothic
+    InitFontx(fx16G,"/fonts/Gigi16.FNT",""); // 8x16Dot Gigi
+    InitFontx(fx24G,"/fonts/Gigi24.FNT",""); // 12x24Dot Gigi
+    InitFontx(fx32G,"/fonts/Gigi32.FNT",""); // 16x32Dot Gigi
 ```
+
+![TTF_FONT](https://github.com/user-attachments/assets/5904c317-5c83-47f3-a49a-240ab7296961)
 
 # How to add your color   
 Change here.   
