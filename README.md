@@ -1,5 +1,6 @@
 # esp-idf-m5stickC-Plus
-Example code for driving M5StickC-Plus/Plus2 ST7789V2 display using ESP-IDF's SPI driver.
+Example code for driving M5StickC-Plus/Plus2 ST7789V2 display using ESP-IDF's SPI driver.   
+M5StickC-Plus/Plus2 has 135x240 ST7789V2 tft.   
 
 ![M5StickC-Plus2](https://github.com/nopnop2002/esp-idf-m5stickC-Plus/assets/6020549/ca0e2687-a557-40b5-b712-5f3f578ddf75)
 
