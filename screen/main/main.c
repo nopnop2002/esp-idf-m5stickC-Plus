@@ -821,6 +821,54 @@ TickType_t PNGTest(TFT_t * dev, char * file, int width, int height) {
 	return diffTick;
 }
 
+TickType_t CodeTest(TFT_t * dev, FontxFile *fx, int width, int height, uint16_t start, uint16_t end) {
+	TickType_t startTick, endTick, diffTick;
+	startTick = xTaskGetTickCount();
+
+	// get font width & height
+	uint8_t buffer[FontxGlyphBufSize];
+	uint8_t fontWidth;
+	uint8_t fontHeight;
+	GetFontx(fx, 0, buffer, &fontWidth, &fontHeight);
+	//ESP_LOGI(__FUNCTION__,"width=%d height=%d",width,height);
+	//ESP_LOGI(__FUNCTION__,"fontWidth=%d fontHeight=%d",fontWidth,fontHeight);
+	//uint8_t xmoji = width / fontWidth;
+	//uint8_t ymoji = height / fontHeight;
+	uint8_t ymoji = width / fontWidth;
+	uint8_t xmoji = height / fontHeight;
+	//ESP_LOGI(__FUNCTION__,"xmoji=%d ymoji=%d",xmoji, ymoji);
+
+	uint16_t color;
+	lcdFillScreen(dev, BLACK);
+	uint8_t code;
+
+	color = CYAN;
+	//lcdSetFontDirection(dev, 0);
+	lcdSetFontDirection(dev, 1);
+	code = start;
+	for(int y=0;y<ymoji;y++) {
+		uint16_t xpos = width - fontHeight*(y+1)-1;;
+		uint16_t ypos = 0;
+		if (fontWidth*xmoji < height) {
+			ypos = ((height - (fontWidth*xmoji)) / 2) - 1;
+		}
+		for(int x=0;x<xmoji;x++) {
+			//ESP_LOGI(__FUNCTION__,"xpos=%d ypos=%d", xpos, ypos);
+			ypos = lcdDrawCode(dev, fx, xpos, ypos, code, color);
+			if (code == 0xFF) break;
+			code++;
+			if (code > end) break;
+		}
+		if (code == 0xFF) break;
+		if (code > end) break;
+	}
+
+	endTick = xTaskGetTickCount();
+	diffTick = endTick - startTick;
+	ESP_LOGI(__FUNCTION__, "elapsed time[ms]:%"PRIu32,diffTick*portTICK_PERIOD_MS);
+	return diffTick;
+}
+
 void tft(void *pvParameters)
 {
 #if CONFIG_M5STICK_C_PLUS
@@ -854,6 +902,12 @@ void tft(void *pvParameters)
 	InitFontx(fx16M,"/fonts/ILMH16XB.FNT",""); // 8x16Dot Mincyo
 	InitFontx(fx24M,"/fonts/ILMH24XB.FNT",""); // 12x24Dot Mincyo
 	InitFontx(fx32M,"/fonts/ILMH32XB.FNT",""); // 16x32Dot Mincyo
+
+	FontxFile fx32E[2];
+	InitFontx(fx32E,"/fonts/emoticons21.fnt",""); // 24x24Dot Smile
+
+	FontxFile fx32S[2];
+	InitFontx(fx32S,"/fonts/Scroll-o-Sprites.fnt",""); // 16x16Dot Emoji
 	
 	TFT_t dev;
 	spi_master_init(&dev, CONFIG_MOSI_GPIO, CONFIG_SCLK_GPIO, CONFIG_CS_GPIO, CONFIG_DC_GPIO, CONFIG_RESET_GPIO, CONFIG_BL_GPIO);
@@ -866,16 +920,15 @@ void tft(void *pvParameters)
 
 #if 0
 	while (1) {
+		FillTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
+		WAIT;
 		ArrowTest(&dev, fx16G, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
+		CodeTest(&dev, fx32E, CONFIG_WIDTH, CONFIG_HEIGHT, 0x20, 0x37);
+		WAIT;
+		CodeTest(&dev, fx32S, CONFIG_WIDTH, CONFIG_HEIGHT, 0x00, 0x6F);
+		WAIT;
 	}
-#endif
-
-#if 0
-	//for TEST
-	lcdDrawFillRect(&dev, 0, 0, 10, 10, RED);
-	lcdDrawFillRect(&dev, 10, 10, 20, 20, GREEN);
-	lcdDrawFillRect(&dev, 20, 20, 30, 30, BLUE);
 #endif
 
 	while(1) {
@@ -943,6 +996,11 @@ void tft(void *pvParameters)
 
 		strcpy(file, "/images/esp_logo.png");
 		PNGTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
+		WAIT;
+
+		CodeTest(&dev, fx32E, CONFIG_WIDTH, CONFIG_HEIGHT, 0x20, 0x37);
+		WAIT;
+		CodeTest(&dev, fx32S, CONFIG_WIDTH, CONFIG_HEIGHT, 0x00, 0x6F);
 		WAIT;
 
 		// Multi Font Test
