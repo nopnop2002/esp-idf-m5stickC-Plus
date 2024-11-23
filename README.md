@@ -107,7 +107,7 @@ save as .fnt file from your fontedit.exe.
 ![emoticons21-3](https://github.com/user-attachments/assets/7d4c7519-7d80-4098-8106-e84894b009dc)
 
 step7)   
-upload your font file to $HOME/esp-idf-m5stickC/fonts directory.   
+upload your font file to $HOME/esp-idf-m5stickC-Plus/fonts directory.   
 
 step8)   
 add font to use   
