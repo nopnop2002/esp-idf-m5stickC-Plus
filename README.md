@@ -113,10 +113,10 @@ step8)
 add font to use   
 ```
 FontxFile fx32E[2];
-InitFontx(fx32E,"/spiffs/emoticons21.fnt",""); // 24x24Dot Smile
+InitFontx(fx32E,"/fonts/emoticons21.fnt",""); // 24x24Dot Smile
 
 FontxFile fx32S[2];
-InitFontx(fx32S,"/spiffs/Scroll-o-Sprites.fnt",""); // 16x16Dot Emoji
+InitFontx(fx32S,"/fonts/Scroll-o-Sprites.fnt",""); // 16x16Dot Emoji
 ```
 
 This is a 24x24 font converted from emoticons21.bdf from u8g2 library.   
