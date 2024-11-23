@@ -54,12 +54,12 @@ PNG file
 
 # Font File   
 This project uses the following as default fonts:   
-- font/ILGH16XB.FNT // 8x16Dot Gothic
-- font/ILGH24XB.FNT // 12x24Dot Gothic
-- font/ILGH32XB.FNT // 16x32Dot Gothic
-- font/ILMH16XB.FNT // 8x16Dot Mincyo
-- font/ILMH24XB.FNT // 12x24Dot Mincyo
-- font/ILMH32XB.FNT // 16x32Dot Mincyo
+- fonts/ILGH16XB.FNT // 8x16Dot Gothic
+- fonts/ILGH24XB.FNT // 12x24Dot Gothic
+- fonts/ILGH32XB.FNT // 16x32Dot Gothic
+- fonts/ILMH16XB.FNT // 8x16Dot Mincyo
+- fonts/ILMH24XB.FNT // 12x24Dot Mincyo
+- fonts/ILMH32XB.FNT // 16x32Dot Mincyo
 
 From 0x00 to 0x7f, the characters image of Alphanumeric are stored.   
 From 0x80 to 0xff, the characters image of Japanese are stored.   
@@ -107,7 +107,7 @@ save as .fnt file from your fontedit.exe.
 ![emoticons21-3](https://github.com/user-attachments/assets/7d4c7519-7d80-4098-8106-e84894b009dc)
 
 step7)   
-upload your font file to $HOME/esp-idf-m5stickC/font directory.   
+upload your font file to $HOME/esp-idf-m5stickC/fonts directory.   
 
 step8)   
 add font to use   
