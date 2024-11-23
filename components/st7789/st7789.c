@@ -799,6 +799,28 @@ int lcdDrawString(TFT_t * dev, FontxFile *fx, uint16_t x, uint16_t y, uint8_t * 
 	return 0;
 }
 
+// Draw Non-Alphanumeric character
+// x:X coordinate
+// y:Y coordinate
+// code:character code
+// color:color
+int lcdDrawCode(TFT_t * dev, FontxFile *fx, uint16_t x,uint16_t y,uint8_t code,uint16_t color) {
+	if(_DEBUG_)printf("code=%x x=%d y=%d\n",code,x,y);
+	if (dev->_font_direction == 0)
+		x = lcdDrawChar(dev, fx, x, y, code, color);
+	if (dev->_font_direction == 1)
+		y = lcdDrawChar(dev, fx, x, y, code, color);
+	if (dev->_font_direction == 2)
+		x = lcdDrawChar(dev, fx, x, y, code, color);
+	if (dev->_font_direction == 3)
+		y = lcdDrawChar(dev, fx, x, y, code, color);
+	if (dev->_font_direction == 0) return x;
+	if (dev->_font_direction == 2) return x;
+	if (dev->_font_direction == 1) return y;
+	if (dev->_font_direction == 3) return y;
+	return 0;
+}
+
 
 #if 0
 // Draw SJIS character
