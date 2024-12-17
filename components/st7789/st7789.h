@@ -31,6 +31,8 @@ typedef struct {
 	int16_t _dc;
 	int16_t _bl;
 	spi_device_handle_t _SPIHandle;
+	bool _use_frame_buffer;
+	uint16_t *_frame_buffer;
 } TFT_t;
 
 void spi_master_init(TFT_t * dev, int16_t GPIO_MOSI, int16_t GPIO_SCLK, int16_t GPIO_CS, int16_t GPIO_DC, int16_t GPIO_RESET, int16_t GPIO_BL);
@@ -43,7 +45,7 @@ bool spi_master_write_color(TFT_t * dev, uint16_t color, uint16_t size);
 bool spi_master_write_colors(TFT_t * dev, uint16_t * colors, uint16_t size);
 
 void delayMS(int ms);
-void lcdInit(TFT_t * dev, int width, int height, int offsetx, int offsety);
+void lcdInit(TFT_t * dev, int width, int height, int offsetx, int offsety, bool frame_buffer);
 void lcdDrawPixel(TFT_t * dev, uint16_t x, uint16_t y, uint16_t color);
 void lcdDrawMultiPixels(TFT_t * dev, uint16_t x, uint16_t y, uint16_t size, uint16_t * colors);
 void lcdDrawFillRect(TFT_t * dev, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
@@ -74,5 +76,10 @@ void lcdBacklightOff(TFT_t * dev);
 void lcdBacklightOn(TFT_t * dev);
 void lcdInversionOff(TFT_t * dev);
 void lcdInversionOn(TFT_t * dev);
+void lcdGetRect(TFT_t * dev, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t *save);
+void lcdSetRect(TFT_t * dev, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t *save);
+void lcdSetCursor(TFT_t * dev, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color, uint16_t *save);
+void lcdResetCursor(TFT_t * dev, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color, uint16_t *save);
+void lcdDrawFinish(TFT_t *dev);
 #endif /* MAIN_ST7789_H_ */
 
