@@ -1158,6 +1158,7 @@ void tft(void *pvParameters)
 			strcpy((char *)ascii, "32Dot Mincyo Font");
 			lcdDrawString(&dev, fx32M, xpos, ypos, ascii, color);
 		}
+		lcdDrawFinish(&dev);
 		lcdSetFontDirection(&dev, 0);
 		WAIT;
 
