@@ -12,8 +12,8 @@ QueueHandle_t xQueueImu;
 
 extern "C" {
 	void app_main(void);
-	esp_err_t mountSPIFFS(const char * partition_label, const char * mount_point);
-	void printDirectory(const char * path);
+	void listSPIFFS(char * path);
+	esp_err_t mountSPIFFS(char * path, char * label, int max_files);
 	void i2c_master_init();
 	void tft(void *pvParameters);
 	void buttonA(void *pvParameters);
@@ -26,8 +26,8 @@ void app_main(void)
 {
 	// Mount SPIFFS File System on FLASH
 	ESP_LOGI(TAG, "Initializing SPIFFS");
-	ESP_ERROR_CHECK(mountSPIFFS("storage1", "/fonts"));
-	printDirectory("/fonts");
+	ESP_ERROR_CHECK(mountSPIFFS("/fonts", "storage1", 8));
+	listSPIFFS("/fonts");
 
 	// Initialize i2c
 	i2c_master_init();
