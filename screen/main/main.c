@@ -64,7 +64,7 @@ TickType_t FillTest(TFT_t * dev, int width, int height) {
 	lcdFillScreen(dev, GREEN);
 	vTaskDelay(50);
 	lcdFillScreen(dev, BLUE);
-	vTaskDelay(50);
+	lcdDrawFinish(dev);
 
 	endTick = xTaskGetTickCount();
 	diffTick = endTick - startTick;
@@ -85,6 +85,7 @@ TickType_t ColorBarTest(TFT_t * dev, int width, int height) {
 		lcdDrawFillRect(dev, 0, y1, width-1, y2-1, GREEN);
 		vTaskDelay(1);
 		lcdDrawFillRect(dev, 0, y2, width-1, height-1, BLUE);
+		lcdDrawFinish(dev);
 	} else {
 		uint16_t x1,x2;
 		x1 = width/3;
@@ -94,6 +95,7 @@ TickType_t ColorBarTest(TFT_t * dev, int width, int height) {
 		lcdDrawFillRect(dev, x1, 0, x2-1, height-1, GREEN);
 		vTaskDelay(1);
 		lcdDrawFillRect(dev, x2, 0, width-1, height-1, BLUE);
+		lcdDrawFinish(dev);
 	}
 
 	endTick = xTaskGetTickCount();
@@ -162,6 +164,7 @@ TickType_t ArrowTest(TFT_t * dev, FontxFile *fx, int width, int height) {
 	stlen = strlen((char *)ascii);
 	xpos = (width-1) - (fontWidth*stlen);
 	lcdDrawString(dev, fx, xpos, ypos, ascii, color);
+	lcdDrawFinish(dev);
 
 	endTick = xTaskGetTickCount();
 	diffTick = endTick - startTick;
@@ -203,6 +206,7 @@ TickType_t DirectionTest(TFT_t * dev, FontxFile *fx, int width, int height) {
 	strcpy((char *)ascii, "Direction=3");
 	lcdSetFontDirection(dev, 3);
 	lcdDrawString(dev, fx, (fontHeight-1), height-1, ascii, color);
+	lcdDrawFinish(dev);
 
 	endTick = xTaskGetTickCount();
 	diffTick = endTick - startTick;
@@ -252,6 +256,7 @@ TickType_t HorizontalTest(TFT_t * dev, FontxFile *fx, int width, int height) {
 	lcdDrawString(dev, fx, width, height-(fontHeight*3)-1, ascii, color);
 	lcdSetFontUnderLine(dev, BLUE);
 	lcdDrawString(dev, fx, width, height-(fontHeight*4)-1, ascii, color);
+	lcdDrawFinish(dev);
 	lcdUnsetFontFill(dev);
 	lcdUnsetFontUnderLine(dev);
 
@@ -303,6 +308,7 @@ TickType_t VerticalTest(TFT_t * dev, FontxFile *fx, int width, int height) {
 	lcdDrawString(dev, fx, (fontHeight*3)-1, height, ascii, color);
 	lcdSetFontUnderLine(dev, BLUE);
 	lcdDrawString(dev, fx, (fontHeight*4)-1, height, ascii, color);
+	lcdDrawFinish(dev);
 	lcdUnsetFontFill(dev);
 	lcdUnsetFontUnderLine(dev);
 
@@ -328,6 +334,7 @@ TickType_t LineTest(TFT_t * dev, int width, int height) {
 	for(int xpos=0;xpos<width;xpos=xpos+10) {
 		lcdDrawLine(dev, xpos, 0, xpos, height, color);
 	}
+	lcdDrawFinish(dev);
 
 	endTick = xTaskGetTickCount();
 	diffTick = endTick - startTick;
@@ -348,6 +355,7 @@ TickType_t CircleTest(TFT_t * dev, int width, int height) {
 	for(int i=5;i<height;i=i+5) {
 		lcdDrawCircle(dev, xpos, ypos, i, color);
 	}
+	lcdDrawFinish(dev);
 
 	endTick = xTaskGetTickCount();
 	diffTick = endTick - startTick;
@@ -432,6 +440,7 @@ TickType_t RoundRectTest(TFT_t * dev, int width, int height) {
 		//ESP_LOGI(__FUNCTION__, "i=%d, width-i-1=%d",i, width-i-1);
 		lcdDrawRoundRect(dev, i, i, (width-i-1), (height-i-1), 10, color);
 	}
+	lcdDrawFinish(dev);
 
 	endTick = xTaskGetTickCount();
 	diffTick = endTick - startTick;
@@ -460,6 +469,7 @@ TickType_t FillRectTest(TFT_t * dev, int width, int height) {
 		uint16_t size=rand()%(width/5);
 		lcdDrawFillRect(dev, xpos, ypos, xpos+size, ypos+size, color);
 	}
+	lcdDrawFinish(dev);
 
 	endTick = xTaskGetTickCount();
 	diffTick = endTick - startTick;
@@ -482,6 +492,7 @@ TickType_t ColorTest(TFT_t * dev, int width, int height) {
 		color = color >> 1;
 		ypos = ypos + delta;
 	}
+	lcdDrawFinish(dev);
 
 	endTick = xTaskGetTickCount();
 	diffTick = endTick - startTick;
@@ -497,6 +508,13 @@ TickType_t BMPTest(TFT_t * dev, char * file, int width, int height) {
 	lcdSetFontDirection(dev, 0);
 	lcdFillScreen(dev, BLACK);
 
+	// allocate memory
+	bmpfile_t *result = (bmpfile_t*)malloc(sizeof(bmpfile_t));
+	if (result == NULL) {
+		ESP_LOGE(__FUNCTION__, "Error allocating memory for bmpfile");
+		return 0;
+	}
+
 	// open requested file
 	esp_err_t ret;
 	FILE* fp = fopen(file, "rb");
@@ -506,11 +524,6 @@ TickType_t BMPTest(TFT_t * dev, char * file, int width, int height) {
 	}
 
 	// read bmp header
-	bmpfile_t *result = (bmpfile_t*)malloc(sizeof(bmpfile_t));
-	if (result == NULL) {
-		ESP_LOGE(__FUNCTION__, "malloc fail");
-		return 0;
-	}
 	ret = fread(result->header.magic, 1, 2, fp);
 	assert(ret == 2);
 	if (result->header.magic[0]!='B' || result->header.magic[1] != 'M') {
@@ -633,6 +646,7 @@ TickType_t BMPTest(TFT_t * dev, char * file, int width, int height) {
 		} // end for row
 		free(colors);
 	} // end if
+	lcdDrawFinish(dev);
 	free(result);
 	fclose(fp);
 
@@ -701,6 +715,7 @@ TickType_t JPEGTest(TFT_t * dev, char * file, int width, int height) {
 			vTaskDelay(1);
 		}
 
+		lcdDrawFinish(dev);
 		free(colors);
 		release_image(&pixels, width, height);
 		ESP_LOGD(__FUNCTION__, "Finish");
@@ -728,10 +743,6 @@ TickType_t PNGTest(TFT_t * dev, char * file, int width, int height) {
 		return 0;
 	}
 
-	char buf[1024];
-	size_t remain = 0;
-	int len;
-
 	pngle_t *pngle = pngle_new(width, height);
 	ESP_LOGD(__FUNCTION__, "pngle=%p", pngle);
 	if (pngle == NULL) {
@@ -747,13 +758,15 @@ TickType_t PNGTest(TFT_t * dev, char * file, int width, int height) {
 	pngle_set_display_gamma(pngle, display_gamma);
 
 
+	char buf[1024];
+	size_t remain = 0;
 	while (!feof(fp)) {
 		if (remain >= sizeof(buf)) {
 			ESP_LOGE(__FUNCTION__, "Buffer exceeded");
 			while(1) vTaskDelay(1);
 		}
 
-		len = fread(buf + remain, 1, sizeof(buf) - remain, fp);
+		int len = fread(buf + remain, 1, sizeof(buf) - remain, fp);
 		if (len <= 0) {
 			//printf("EOF\n");
 			break;
@@ -812,6 +825,85 @@ TickType_t PNGTest(TFT_t * dev, char * file, int width, int height) {
 		lcdDrawMultiPixels(dev, offsetX, y+offsetY, pngWidth, colors);
 		vTaskDelay(1);
 	}
+	lcdDrawFinish(dev);
+	free(colors);
+	pngle_destroy(pngle, width, height);
+
+	endTick = xTaskGetTickCount();
+	diffTick = endTick - startTick;
+	ESP_LOGI(__FUNCTION__, "elapsed time[ms]:%"PRIu32,diffTick*portTICK_PERIOD_MS);
+	return diffTick;
+}
+
+TickType_t IconTest(TFT_t * dev, char * file, int width, int height, int xpos, int ypos) {
+	TickType_t startTick, endTick, diffTick;
+	startTick = xTaskGetTickCount();
+
+	// open PNG file
+	FILE* fp = fopen(file, "rb");
+	if (fp == NULL) {
+		ESP_LOGW(__FUNCTION__, "File not found [%s]", file);
+		return 0;
+	}
+
+	pngle_t *pngle = pngle_new(width, height);
+	if (pngle == NULL) {
+		ESP_LOGE(__FUNCTION__, "pngle_new fail");
+		fclose(fp);
+		return 0;
+	}
+	pngle_set_init_callback(pngle, png_init);
+	pngle_set_draw_callback(pngle, png_draw);
+	pngle_set_done_callback(pngle, png_finish);
+
+	double display_gamma = 2.2;
+	pngle_set_display_gamma(pngle, display_gamma);
+
+	char buf[1024];
+	size_t remain = 0;
+	while (!feof(fp)) {
+		if (remain >= sizeof(buf)) {
+			ESP_LOGE(__FUNCTION__, "Buffer exceeded");
+			while(1) vTaskDelay(1);
+		}
+
+		int len = fread(buf + remain, 1, sizeof(buf) - remain, fp);
+		if (len <= 0) {
+			//printf("EOF\n");
+			break;
+		}
+
+		int fed = pngle_feed(pngle, buf, remain + len);
+		if (fed < 0) {
+			ESP_LOGE(__FUNCTION__, "ERROR; %s", pngle_error(pngle));
+			while(1) vTaskDelay(1);
+		}
+
+		remain = remain + len - fed;
+		if (remain > 0) memmove(buf, buf + fed, remain);
+	}
+	fclose(fp);
+
+	uint16_t pngWidth = pngle_get_width(pngle);
+	uint16_t pngHeight = pngle_get_height(pngle);
+	ESP_LOGD(__FUNCTION__, "pngWidth=%d pngHeight=%d", pngWidth, pngHeight);
+	uint16_t *colors = (uint16_t*)malloc(sizeof(uint16_t) * pngWidth);
+	if (colors == NULL) {
+		ESP_LOGE(__FUNCTION__, "malloc fail");
+		pngle_destroy(pngle, width, height);
+		return 0; 
+	}
+
+	for(int y = 0; y < pngHeight; y++){
+		for(int x = 0;x < pngWidth; x++){
+			//pixel_png pixel = pngle->pixels[y][x];
+			//colors[x] = rgb565(pixel.red, pixel.green, pixel.blue);
+			colors[x] = pngle->pixels[y][x];
+		}
+		lcdDrawMultiPixels(dev, xpos, y+ypos, pngWidth, colors);
+		vTaskDelay(1);
+	}
+	lcdDrawFinish(dev);
 	free(colors);
 	pngle_destroy(pngle, width, height);
 
@@ -862,6 +954,7 @@ TickType_t CodeTest(TFT_t * dev, FontxFile *fx, int width, int height, uint16_t 
 		if (code == 0xFF) break;
 		if (code > end) break;
 	}
+	lcdDrawFinish(dev);
 
 	endTick = xTaskGetTickCount();
 	diffTick = endTick - startTick;
@@ -911,22 +1004,23 @@ void tft(void *pvParameters)
 	
 	TFT_t dev;
 	spi_master_init(&dev, CONFIG_MOSI_GPIO, CONFIG_SCLK_GPIO, CONFIG_CS_GPIO, CONFIG_DC_GPIO, CONFIG_RESET_GPIO, CONFIG_BL_GPIO);
-	lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY);
+	lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY, true);
 
 #if CONFIG_INVERSION
 	ESP_LOGI(TAG, "Enable Display Inversion");
 	lcdInversionOn(&dev);
 #endif
 
+	char file[32];
 #if 0
 	while (1) {
-		FillTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
+		lcdFillScreen(&dev, WHITE);
+		strcpy(file, "/icons/twitter.png");
+		IconTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT, 30, 85);
 		WAIT;
-		ArrowTest(&dev, fx16G, CONFIG_WIDTH, CONFIG_HEIGHT);
-		WAIT;
-		CodeTest(&dev, fx32E, CONFIG_WIDTH, CONFIG_HEIGHT, 0x20, 0x37);
-		WAIT;
-		CodeTest(&dev, fx32S, CONFIG_WIDTH, CONFIG_HEIGHT, 0x00, 0x6F);
+
+		strcpy(file, "/icons/facebook.png");
+		IconTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT, 30, 85);
 		WAIT;
 	}
 #endif
@@ -951,11 +1045,13 @@ void tft(void *pvParameters)
 		RoundRectTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
 
-		RectAngleTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
-		WAIT;
+		if (dev._use_frame_buffer == false) {
+			RectAngleTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
+			WAIT;
 
-		TriangleTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
-		WAIT;
+			TriangleTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
+			WAIT;
+		}
 
 		if (CONFIG_WIDTH >= 240) {
 			DirectionTest(&dev, fx24G, CONFIG_WIDTH, CONFIG_HEIGHT);
@@ -984,7 +1080,6 @@ void tft(void *pvParameters)
 		ColorTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
 
-		char file[32];
 		//strcpy(file, "/images/image.bmp");
 		strcpy(file, "/images/esp32_135.bmp");
 		BMPTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
@@ -996,6 +1091,15 @@ void tft(void *pvParameters)
 
 		strcpy(file, "/images/esp_logo.png");
 		PNGTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
+		WAIT;
+
+		lcdFillScreen(&dev, WHITE);
+		strcpy(file, "/icons/twitter.png");
+		IconTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT, 30, 85);
+		WAIT;
+
+		strcpy(file, "/icons/facebook.png");
+		IconTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT, 30, 85);
 		WAIT;
 
 		CodeTest(&dev, fx32E, CONFIG_WIDTH, CONFIG_HEIGHT, 0x20, 0x37);
@@ -1065,71 +1169,61 @@ void tft(void *pvParameters)
 	}
 }
 
-esp_err_t mountSPIFFS(char * partition_label, char * mount_point) {
-	ESP_LOGI(TAG, "Initializing SPIFFS");
+static void listSPIFFS(char * path) {
+	DIR* dir = opendir(path);
+	assert(dir != NULL);
+	while (true) {
+		struct dirent*pe = readdir(dir);
+		if (!pe) break;
+		ESP_LOGI(__FUNCTION__,"d_name=%s d_ino=%d d_type=%x", pe->d_name,pe->d_ino, pe->d_type);
+	}
+	closedir(dir);
+}
+
+esp_err_t mountSPIFFS(char * path, char * label, int max_files) {
 	esp_vfs_spiffs_conf_t conf = {
-		.base_path = mount_point,
-		.partition_label = partition_label,
-		.max_files = 10, // maximum number of files which can be open at the same time
-		.format_if_mount_failed = true
+		.base_path = path,
+		.partition_label = label,
+		.max_files = max_files,
+		.format_if_mount_failed =true
 	};
 
-	// Use settings defined above to initialize and mount SPIFFS filesystem.
-	// Note: esp_vfs_spiffs_register is an all-in-one convenience function.
+	// Use settings defined above toinitialize and mount SPIFFS filesystem.
+	// Note: esp_vfs_spiffs_register is anall-in-one convenience function.
 	esp_err_t ret = esp_vfs_spiffs_register(&conf);
 
 	if (ret != ESP_OK) {
-		if (ret == ESP_FAIL) {
+		if (ret ==ESP_FAIL) {
 			ESP_LOGE(TAG, "Failed to mount or format filesystem");
-		} else if (ret == ESP_ERR_NOT_FOUND) {
+		} else if (ret== ESP_ERR_NOT_FOUND) {
 			ESP_LOGE(TAG, "Failed to find SPIFFS partition");
 		} else {
-			ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+			ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)",esp_err_to_name(ret));
 		}
 		return ret;
 	}
 
-	size_t total = 0, used = 0;
-	//ret = esp_spiffs_info(NULL, &total, &used);
-	ret = esp_spiffs_info(partition_label, &total, &used);
+#if 0
+	ESP_LOGI(TAG, "Performing SPIFFS_check().");
+	ret = esp_spiffs_check(conf.partition_label);
 	if (ret != ESP_OK) {
-		ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
+		ESP_LOGE(TAG, "SPIFFS_check() failed (%s)", esp_err_to_name(ret));
+		return ret;
 	} else {
-		ESP_LOGI(TAG, "Partition [%s] size: total: %d, used: %d", mount_point, total, used);
+			ESP_LOGI(TAG, "SPIFFS_check() successful");
 	}
+#endif
+
+	size_t total = 0, used = 0;
+	ret = esp_spiffs_info(conf.partition_label, &total, &used);
+	if (ret != ESP_OK) {
+		ESP_LOGE(TAG,"Failed to get SPIFFS partition information (%s)",esp_err_to_name(ret));
+	} else {
+		ESP_LOGI(TAG,"Mount %s to %s success", path, label);
+		ESP_LOGI(TAG,"Partition size: total: %d, used: %d", total, used);
+	}
+
 	return ret;
-}
-
-static int getFileSize(char *fullPath) {
-	struct stat st;
-	if (stat(fullPath, &st) == 0)
-		return st.st_size;
-	return -1;
-}
-
-static void printDirectory(char * path) {
-	DIR* dir = opendir(path);
-	assert(dir != NULL);
-	while (true) {
-		struct dirent *pe = readdir(dir);
-		if (!pe) break;
-		if (pe->d_type == 1) {
-			char fullPath[64];
-			strcpy(fullPath, path);
-			strcat(fullPath, "/");
-			strcat(fullPath, pe->d_name);
-			int fsize = getFileSize(fullPath);
-			ESP_LOGI(__FUNCTION__,"%s d_name=%s d_ino=%d fsize=%d", path, pe->d_name, pe->d_ino, fsize);
-		}
-		if (pe->d_type == 2) {
-			char subDir[127];
-			sprintf(subDir,"%s%.64s", path, pe->d_name);
-			ESP_LOGI(TAG, "subDir=[%s]", subDir);
-			printDirectory(subDir);
-
-		}
-	}
-	closedir(dir);
 }
 
 
@@ -1137,10 +1231,14 @@ void app_main(void)
 {
 	// Mount SPIFFS File System on FLASH
 	ESP_LOGI(TAG, "Initializing SPIFFS");
-	ESP_ERROR_CHECK(mountSPIFFS("storage1", "/fonts"));
-	printDirectory("/fonts");
-	ESP_ERROR_CHECK(mountSPIFFS("storage2", "/images"));
-	printDirectory("/images");
+	ESP_ERROR_CHECK(mountSPIFFS("/fonts", "storage1", 8));
+	listSPIFFS("/fonts");
+
+	ESP_ERROR_CHECK(mountSPIFFS("/images", "storage2", 1));
+	listSPIFFS("/images");
+
+	ESP_ERROR_CHECK(mountSPIFFS("/icons", "storage3", 1));
+	listSPIFFS("/icons");
 
 	// Initialize i2c
 	i2c_master_init();

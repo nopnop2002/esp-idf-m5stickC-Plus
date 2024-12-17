@@ -13,3 +13,4 @@ project(m5stckC-Plus)
 # the target with 'idf.py -p PORT flash
 spiffs_create_partition_image(storage1 fonts FLASH_IN_PROJECT)
 spiffs_create_partition_image(storage2 images FLASH_IN_PROJECT)
+spiffs_create_partition_image(storage3 icons FLASH_IN_PROJECT)
