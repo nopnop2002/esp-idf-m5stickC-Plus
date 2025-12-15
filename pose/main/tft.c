@@ -10,8 +10,12 @@
 #include "esp_err.h"
 #include "esp_log.h"
 
+#if CONFIG_M5STICK_C_PLUS
 #include "axp192.h"
+#endif
+#if CONFIG_M5STICK_C_PLUS2
 #include "sgm2578.h"
+#endif
 #include "st7789.h"
 #include "fontx.h"
 #include "parameter.h"

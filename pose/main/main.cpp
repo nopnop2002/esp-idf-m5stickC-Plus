@@ -12,8 +12,8 @@ QueueHandle_t xQueueImu;
 
 extern "C" {
 	void app_main(void);
-	void listSPIFFS(char * path);
-	esp_err_t mountSPIFFS(char * path, char * label, int max_files);
+	void listSPIFFS(const char * path);
+	esp_err_t mountSPIFFS(const char * path, const char * label, int max_files);
 	void i2c_master_init();
 	void tft(void *pvParameters);
 	void buttonA(void *pvParameters);
@@ -39,10 +39,6 @@ void app_main(void)
 	// Start tft task
 	xTaskCreate(&tft, "TFT", 1024*6, NULL, 5, NULL);
 	vTaskDelay(100);
-
-	// Start button task
-	//xTaskCreate(&buttonA, "BUTTON", 1024*2, NULL, 5, NULL);
-	//vTaskDelay(100);
 
 	// Start imu task
 	xTaskCreate(&mpu6050, "IMU", 1024*8, NULL, 5, NULL);
