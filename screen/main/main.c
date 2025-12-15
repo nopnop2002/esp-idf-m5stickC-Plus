@@ -11,8 +11,12 @@
 #include "esp_spiffs.h"
 #include "driver/gpio.h"
 
+#if CONFIG_M5STICK_C_PLUS
 #include "axp192.h"
+#endif
+#if CONFIG_M5STICK_C_PLUS2
 #include "sgm2578.h"
+#endif
 #include "st7789.h"
 #include "fontx.h"
 #include "bmpfile.h"
@@ -964,6 +968,7 @@ TickType_t CodeTest(TFT_t * dev, FontxFile *fx, int width, int height, uint16_t 
 
 void tft(void *pvParameters)
 {
+	ESP_LOGI(TAG, "Start");
 #if CONFIG_M5STICK_C_PLUS
 	// power on
 	AXP192_PowerOn();
@@ -1241,8 +1246,10 @@ void app_main(void)
 	ESP_ERROR_CHECK(mountSPIFFS("/icons", "storage3", 1));
 	listSPIFFS("/icons");
 
+#if CONFIG_M5STICK_C_PLUS
 	// Initialize i2c
 	i2c_master_init();
+#endif
 
 	// Start Task
 	xTaskCreate(tft, "TFT", 1024*6, NULL, 2, NULL);
