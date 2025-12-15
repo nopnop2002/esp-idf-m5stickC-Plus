@@ -33,8 +33,12 @@ void buttonA(void *pvParameters)
 	motion6.sender = SENDER_BUTTON;
 	
 	// set the GPIO as a input
-	gpio_reset_pin(GPIO_INPUT_A);
-	gpio_set_direction(GPIO_INPUT_A, GPIO_MODE_DEF_INPUT);
+	//gpio_reset_pin(GPIO_INPUT_A);
+	//gpio_set_direction(GPIO_INPUT_A, GPIO_MODE_DEF_INPUT);
+	gpio_config_t io_conf = {};
+	io_conf.mode = GPIO_MODE_INPUT;
+	io_conf.pin_bit_mask = (1ULL<<GPIO_INPUT_A);
+	gpio_config(&io_conf);
 
 	while(1) {
 		int level = gpio_get_level(GPIO_INPUT_A);
@@ -58,8 +62,12 @@ void buttonB(void *pvParameters)
 	motion6.sender = SENDER_BUTTON;
 
 	// set the GPIO as a input
-	gpio_reset_pin(GPIO_INPUT_B);
-	gpio_set_direction(GPIO_INPUT_B, GPIO_MODE_DEF_INPUT);
+	//gpio_reset_pin(GPIO_INPUT_B);
+	//gpio_set_direction(GPIO_INPUT_B, GPIO_MODE_DEF_INPUT);
+	gpio_config_t io_conf = {};
+	io_conf.mode = GPIO_MODE_INPUT;
+	io_conf.pin_bit_mask = (1ULL<<GPIO_INPUT_A);
+	gpio_config(&io_conf);
 
 	while(1) {
 		int level = gpio_get_level(GPIO_INPUT_A);
