@@ -15,7 +15,8 @@ StickC-Plus2 use a SGM2578 as a PMU, which can be controlled via gpio.
 
 
 # Software requirements
-esp-idf v4.4/v5.x.   
+ESP-IDF V5.2 or later.   
+Because this project uses the new I2C driver.   
 
 # Installation
 ```
