@@ -6,16 +6,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
-#include "driver/gpio.h"
 #include "esp_err.h"
 #include "esp_log.h"
 
-#if CONFIG_M5STICK_C_PLUS
-#include "axp192.h"
-#endif
-#if CONFIG_M5STICK_C_PLUS2
-#include "sgm2578.h"
-#endif
 #include "st7789.h"
 #include "fontx.h"
 #include "parameter.h"
@@ -57,23 +50,6 @@ static const char *TAG = "TFT";
 void tft(void *pvParameters)
 {
 	ESP_LOGI(TAG, "Start");
-#if CONFIG_M5STICK_C_PLUS
-	// power on
-	AXP192_PowerOn();
-	AXP192_ScreenBreath(11);
-#endif
-
-#if CONFIG_M5STICK_C_PLUS2
-	// power hold
-	#define POWER_HOLD_GPIO 4
-	gpio_reset_pin( POWER_HOLD_GPIO );
-	gpio_set_direction( POWER_HOLD_GPIO, GPIO_MODE_OUTPUT );
-	gpio_set_level( POWER_HOLD_GPIO, 1 );
-	// Enable SGM2578. VLED is supplied by SGM2578
-	#define SGM2578_ENABLE_GPIO 27
-	sgm2578_Enable(SGM2578_ENABLE_GPIO);
-#endif
-
 #if 0
 	// set font file
 	FontxFile fx16G[2];
@@ -93,7 +69,8 @@ void tft(void *pvParameters)
 	
 	TFT_t dev;
 	spi_master_init(&dev, CONFIG_MOSI_GPIO, CONFIG_SCLK_GPIO, CONFIG_CS_GPIO, CONFIG_DC_GPIO, CONFIG_RESET_GPIO, CONFIG_BL_GPIO);
-	lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY, false);
+	lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY);
+	lcdEnableFrameBuffer(&dev);
 
 	int width = CONFIG_WIDTH;
 	int height = CONFIG_HEIGHT;
@@ -140,6 +117,7 @@ void tft(void *pvParameters)
 				}
 	
 				lcdDrawCircle(&dev, xpos, ypos, 10, colors[color_index]);
+				lcdDrawFinish(&dev);
 			} // from imu
 			if (motion6.sender == SENDER_BUTTON) {
 				color_index++;
