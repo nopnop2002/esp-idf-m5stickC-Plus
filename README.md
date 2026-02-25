@@ -10,6 +10,10 @@ Both are equipped with the MPU-6886.
 The MPU-6886 uses an I2C interface.   
 SYS_SDA is IO21 and SYS_SCL is IO22.   
 
+StickC-Plus uses an AXP192 as a PMU, which can be controlled via i2c.   
+StickC-Plus2 use a SGM2578 as a PMU, which can be controlled via gpio.   
+
+
 # Software requirements
 esp-idf v4.4/v5.x.   
 
