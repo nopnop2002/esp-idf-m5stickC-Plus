@@ -5,7 +5,8 @@ I used [this](https://github.com/jrowberg/i2cdevlib/tree/master/Arduino) I2Cdev 
 ![imu](https://github.com/nopnop2002/esp-idf-m5stickC-Plus/assets/6020549/e9148d7e-3469-47b6-8d80-8c2c365524b3)
 
 # Software requirements
-esp-idf v4.4/v5.x.   
+ESP-IDF V5.2 or later.   
+Because this project uses the new I2C driver.   
 
 # Installation
 ```
