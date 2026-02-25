@@ -11,7 +11,7 @@ The MPU-6886 is connected to the ESP32 using an I2C interface.
 SYS_SDA is IO21 and SYS_SCL is IO22.   
 
 StickC-Plus uses an AXP192 as a PMU, which can be controlled via i2c.   
-StickC-Plus2 use a SGM2578 as a PMU, which can be controlled via gpio.   
+StickC-Plus2 uses a SGM2578 as a PMU, which can be controlled via gpio.   
 
 
 # Software requirements
