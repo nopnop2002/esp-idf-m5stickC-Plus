@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <time.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -17,6 +18,7 @@
 #if CONFIG_M5STICK_C_PLUS2
 #include "sgm2578.h"
 #endif
+
 #include "st7789.h"
 #include "fontx.h"
 #include "bmpfile.h"
@@ -113,10 +115,9 @@ TickType_t ArrowTest(TFT_t * dev, FontxFile *fx, int width, int height) {
 	startTick = xTaskGetTickCount();
 
 	// get font width & height
-	uint8_t buffer[FontxGlyphBufSize];
 	uint8_t fontWidth;
 	uint8_t fontHeight;
-	GetFontx(fx, 0, buffer, &fontWidth, &fontHeight);
+	GetFontx(fx, 0, &fontWidth, &fontHeight);
 	//ESP_LOGI(__FUNCTION__,"fontWidth=%d fontHeight=%d",fontWidth,fontHeight);
 	
 	uint16_t xpos;
@@ -181,10 +182,9 @@ TickType_t DirectionTest(TFT_t * dev, FontxFile *fx, int width, int height) {
 	startTick = xTaskGetTickCount();
 
 	// get font width & height
-	uint8_t buffer[FontxGlyphBufSize];
 	uint8_t fontWidth;
 	uint8_t fontHeight;
-	GetFontx(fx, 0, buffer, &fontWidth, &fontHeight);
+	GetFontx(fx, 0, &fontWidth, &fontHeight);
 	//ESP_LOGI(__FUNCTION__,"fontWidth=%d fontHeight=%d",fontWidth,fontHeight);
 
 	uint16_t color;
@@ -223,10 +223,9 @@ TickType_t HorizontalTest(TFT_t * dev, FontxFile *fx, int width, int height) {
 	startTick = xTaskGetTickCount();
 
 	// get font width & height
-	uint8_t buffer[FontxGlyphBufSize];
 	uint8_t fontWidth;
 	uint8_t fontHeight;
-	GetFontx(fx, 0, buffer, &fontWidth, &fontHeight);
+	GetFontx(fx, 0, &fontWidth, &fontHeight);
 	//ESP_LOGI(__FUNCTION__,"fontWidth=%d fontHeight=%d",fontWidth,fontHeight);
 
 	uint16_t color;
@@ -275,10 +274,9 @@ TickType_t VerticalTest(TFT_t * dev, FontxFile *fx, int width, int height) {
 	startTick = xTaskGetTickCount();
 
 	// get font width & height
-	uint8_t buffer[FontxGlyphBufSize];
 	uint8_t fontWidth;
 	uint8_t fontHeight;
-	GetFontx(fx, 0, buffer, &fontWidth, &fontHeight);
+	GetFontx(fx, 0, &fontWidth, &fontHeight);
 	//ESP_LOGI(__FUNCTION__,"fontWidth=%d fontHeight=%d",fontWidth,fontHeight);
 
 	uint16_t color;
@@ -922,10 +920,9 @@ TickType_t CodeTest(TFT_t * dev, FontxFile *fx, int width, int height, uint16_t 
 	startTick = xTaskGetTickCount();
 
 	// get font width & height
-	uint8_t buffer[FontxGlyphBufSize];
 	uint8_t fontWidth;
 	uint8_t fontHeight;
-	GetFontx(fx, 0, buffer, &fontWidth, &fontHeight);
+	GetFontx(fx, 0, &fontWidth, &fontHeight);
 	//ESP_LOGI(__FUNCTION__,"width=%d height=%d",width,height);
 	//ESP_LOGI(__FUNCTION__,"fontWidth=%d fontHeight=%d",fontWidth,fontHeight);
 	//uint8_t xmoji = width / fontWidth;
@@ -966,26 +963,350 @@ TickType_t CodeTest(TFT_t * dev, FontxFile *fx, int width, int height, uint16_t 
 	return diffTick;
 }
 
+TickType_t WrapArroundTest(TFT_t * dev, int width, int height) {
+	TickType_t startTick, endTick, diffTick;
+	startTick = xTaskGetTickCount();
+
+	int counter = 0;
+	for (int i=0;i<height;i++) {
+		lcdWrapArround(dev, SCROLL_UP, 40, 79);
+		lcdWrapArround(dev, SCROLL_DOWN, width-80, width-41);
+		counter++;
+		if (counter == 5) {
+			lcdDrawFinish(dev);
+			counter = 0;
+		}
+	}
+	if (counter != 0) lcdDrawFinish(dev);
+	vTaskDelay(100);
+
+	counter = 0;
+	for (int i=0;i<width;i++) {
+		lcdWrapArround(dev, SCROLL_RIGHT, 40, 79);
+		lcdWrapArround(dev, SCROLL_LEFT, height-80, height-41);
+		counter++;
+		if (counter == 5) {
+			lcdDrawFinish(dev);
+			counter = 0;
+		}
+	}
+	if (counter != 0) lcdDrawFinish(dev);
+	vTaskDelay(100);
+
+	if (width == height) {
+		counter = 0;
+		for (int i=0;i<width;i++) {
+			lcdWrapArround(dev, SCROLL_UP, 0, width-1);
+			lcdWrapArround(dev, SCROLL_RIGHT, 0, height-1);
+			counter++;
+			if (counter == 5) {
+				lcdDrawFinish(dev);
+				counter = 0;
+			}
+		}
+		if (counter != 0) lcdDrawFinish(dev);
+
+#if 0
+		vTaskDelay(100);
+		for (int i=0;i<width;i++) {
+			lcdWrapArround(dev, SCROLL_DOWN, 0, width-1);
+			lcdWrapArround(dev, SCROLL_LEFT, 0, height-1);
+			if ((i % 2) == 1) {
+				lcdDrawFinish(dev);
+			}
+		}
+#endif
+	}
+
+	endTick = xTaskGetTickCount();
+	diffTick = endTick - startTick;
+	ESP_LOGI(__FUNCTION__, "elapsed time[ms]:%"PRIu32,diffTick*portTICK_PERIOD_MS);
+	return diffTick;
+}
+
+void RotateImages(int width, int height, uint16_t *image) {
+	int index1 = 0;
+	int index2 = width * height -1;
+	for (int i=0;i<(width * height)/2;i++) {
+		uint16_t d1 = image[index1];
+		uint16_t d2 = image[index2];
+		//ESP_LOGI(__FUNCTION__, "index1=%d index2=%d", index1, index2);
+		image[index1] = d2;
+		image[index2] = d1;
+		index1++;
+		index2--;
+	}
+}
+
+TickType_t ImageMoveTest(TFT_t * dev, int width, int height) {
+	TickType_t startTick, endTick, diffTick;
+	startTick = xTaskGetTickCount();
+
+	int blockWidth = width / 5;
+	int blockHeight = height / 5;
+	ESP_LOGD(__FUNCTION__, "blockWidth=%d blockHeight=%d", blockWidth, blockHeight);
+
+	uint16_t *block1 = (uint16_t*)malloc(sizeof(uint16_t) * blockWidth * blockHeight);
+	if (block1 == NULL) {
+		ESP_LOGE(__FUNCTION__, "Error allocating memory for block1");
+		return 0;
+	}
+
+	uint16_t *block2 = (uint16_t*)malloc(sizeof(uint16_t) * blockWidth * blockHeight);
+	if (block2 == NULL) {
+		free(block1);
+		ESP_LOGE(__FUNCTION__, "Error allocating memory for block2");
+		return 0;
+	}
+
+	for (int y=0;y<2;y++) {
+		for (int x=0;x<5;x++) {
+			int x1 = x * blockWidth;
+			int y1 = y * blockHeight;
+			int x2 = x1 + blockWidth - 1;
+			int y2 = y1 + blockHeight - 1;
+			ESP_LOGD(__FUNCTION__, "x1=%d y1=%d x2=%d y2=%d", x1, y1, x2, y2);
+			lcdGetRect(dev, x1, y1, x2, y2, block1);
+
+			int x3 = blockWidth * (4-x);
+			int y3 = blockHeight * (4-y);
+			int x4 = x3 + blockWidth - 1;
+			int y4 = y3 + blockHeight - 1;
+			ESP_LOGD(__FUNCTION__, "x3=%d y3=%d x4=%d y4=%d", x3, y3, x4, y4);
+			lcdGetRect(dev, x3, y3, x4, y4, block2);
+
+			RotateImages(blockWidth, blockHeight, block1);
+			RotateImages(blockWidth, blockHeight, block2);
+			lcdSetRect(dev, x1, y1, x2, y2, block2);
+			lcdSetRect(dev, x3, y3, x4, y4, block1);
+			lcdDrawFinish(dev);
+		}
+	}
+
+	for (int x=0;x<2;x++) {
+		int x1 = x * blockWidth;;
+		int y1 = 2 * blockHeight;
+		int x2 = x1 + blockWidth - 1;
+		int y2 = y1 + blockHeight - 1;
+		ESP_LOGD(__FUNCTION__, "x1=%d y1=%d x2=%d y2=%d", x1, y1, x2, y2);
+		lcdGetRect(dev, x1, y1, x2, y2, block1);
+
+		int x3 = blockWidth * (4-x);
+		int y3 = 2 * blockHeight;
+		int x4 = x3 + blockWidth - 1;
+		int y4 = y3 + blockHeight - 1;
+		ESP_LOGD(__FUNCTION__, "x3=%d y3=%d x4=%d y4=%d", x3, y3, x4, y4);
+		lcdGetRect(dev, x3, y3, x4, y4, block2);
+
+		RotateImages(blockWidth, blockHeight, block1);
+		RotateImages(blockWidth, blockHeight, block2);
+		lcdSetRect(dev, x1, y1, x2, y2, block2);
+		lcdSetRect(dev, x3, y3, x4, y4, block1);
+		lcdDrawFinish(dev);
+	}
+
+	int x1 = 2 * blockWidth;;
+	int y1 = 2 * blockHeight;
+	int x2 = x1 + blockWidth - 1;
+	int y2 = y1 + blockHeight - 1;
+	ESP_LOGD(__FUNCTION__, "x1=%d y1=%d x2=%d y2=%d", x1, y1, x2, y2);
+	lcdGetRect(dev, x1, y1, x2, y2, block1);
+	RotateImages(blockWidth, blockHeight, block1);
+	lcdSetRect(dev, x1, y1, x2, y2, block1);
+	lcdDrawFinish(dev);
+
+	free(block1);
+	free(block2);
+	endTick = xTaskGetTickCount();
+	diffTick = endTick - startTick;
+	ESP_LOGI(__FUNCTION__, "elapsed time[ms]:%"PRIu32,diffTick*portTICK_PERIOD_MS);
+	return diffTick;
+}
+
+TickType_t ImageInversionTest(TFT_t * dev, int width, int height) {
+	TickType_t startTick, endTick, diffTick;
+	startTick = xTaskGetTickCount();
+
+	int blockWidth = width / 5;
+	int blockHeight = height / 5;
+	ESP_LOGD(__FUNCTION__, "blockWidth=%d blockHeight=%d", blockWidth, blockHeight);
+
+	for (int y=0;y<2;y++) {
+		for (int x=0;x<5;x++) {
+			int x1 = x * blockWidth;
+			int y1 = y * blockHeight;
+			int x2 = x1 + blockWidth - 1;
+			int y2 = y1 + blockHeight - 1;
+			ESP_LOGD(__FUNCTION__, "x1=%d y1=%d x2=%d y2=%d", x1, y1, x2, y2);
+			lcdInversionArea(dev, x1, y1, x2, y2, NULL);
+
+			int x3 = blockWidth * (4-x);
+			int y3 = blockHeight * (4-y);
+			int x4 = x3 + blockWidth - 1;
+			int y4 = y3 + blockHeight - 1;
+			ESP_LOGD(__FUNCTION__, "x3=%d y3=%d x4=%d y4=%d", x3, y3, x4, y4);
+			lcdInversionArea(dev, x3, y3, x4, y4, NULL);
+			lcdDrawFinish(dev);
+		}
+	}
+
+	for (int x=0;x<2;x++) {
+		int x1 = x * blockWidth;;
+		int y1 = 2 * blockHeight;
+		int x2 = x1 + blockWidth - 1;
+		int y2 = y1 + blockHeight - 1;
+		ESP_LOGD(__FUNCTION__, "x1=%d y1=%d x2=%d y2=%d", x1, y1, x2, y2);
+		lcdInversionArea(dev, x1, y1, x2, y2, NULL);
+
+		int x3 = blockWidth * (4-x);
+		int y3 = 2 * blockHeight;
+		int x4 = x3 + blockWidth - 1;
+		int y4 = y3 + blockHeight - 1;
+		ESP_LOGD(__FUNCTION__, "x3=%d y3=%d x4=%d y4=%d", x3, y3, x4, y4);
+		lcdInversionArea(dev, x3, y3, x4, y4, NULL);
+		lcdDrawFinish(dev);
+	}
+
+	int x1 = 2 * blockWidth;;
+	int y1 = 2 * blockHeight;
+	int x2 = x1 + blockWidth - 1;
+	int y2 = y1 + blockHeight - 1;
+	ESP_LOGD(__FUNCTION__, "x1=%d y1=%d x2=%d y2=%d", x1, y1, x2, y2);
+	lcdInversionArea(dev, x1, y1, x2, y2, NULL);
+	lcdDrawFinish(dev);
+
+	endTick = xTaskGetTickCount();
+	diffTick = endTick - startTick;
+	ESP_LOGI(__FUNCTION__, "elapsed time[ms]:%"PRIu32,diffTick*portTICK_PERIOD_MS);
+	return diffTick;
+}
+
+TickType_t TextBoxTest(TFT_t * dev, FontxFile *fx, int width, int height) {
+	TickType_t startTick, endTick, diffTick;
+	startTick = xTaskGetTickCount();
+
+	// get font width & height
+	uint8_t fontWidth;
+	uint8_t fontHeight;
+	GetFontx(fx, 0, &fontWidth, &fontHeight);
+	ESP_LOGI(__FUNCTION__,"fontWidth=%d fontHeight=%d",fontWidth,fontHeight);
+
+	uint16_t bg_color = BLACK;
+	lcdFillScreen(dev, bg_color);
+
+	uint16_t fg_color = WHITE;
+	char AtoZ[27];
+	strcpy(AtoZ, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	uint8_t ascii[20];
+	memset(ascii, 0x00, sizeof(ascii));
+
+	int delay = 200;
+	for(int index=0;index<21;index++) {
+		lcdSetFontDirection(dev, 0);
+		lcdDrawString(dev, fx, 0, fontHeight-1, ascii, bg_color);
+		lcdSetFontDirection(dev, 1);
+		lcdDrawString(dev, fx, width-fontHeight, 0, ascii, bg_color);
+		lcdSetFontDirection(dev, 2);
+		lcdDrawString(dev, fx, width, height-fontHeight-1, ascii, bg_color);
+		lcdSetFontDirection(dev, 3);
+		lcdDrawString(dev, fx, fontHeight-1, height, ascii, bg_color);
+
+		strncpy((char *)ascii, &AtoZ[index], 6);
+		lcdSetFontDirection(dev, 0);
+		lcdDrawString(dev, fx, 0, fontHeight-1, ascii, fg_color);
+		lcdSetFontDirection(dev, 1);
+		lcdDrawString(dev, fx, width-fontHeight, 0, ascii, fg_color);
+		lcdSetFontDirection(dev, 2);
+		lcdDrawString(dev, fx, width, height-fontHeight-1, ascii, fg_color);
+		lcdSetFontDirection(dev, 3);
+		lcdDrawString(dev, fx, fontHeight-1, height, ascii, fg_color);
+		lcdDrawFinish(dev);
+		vTaskDelay(delay);
+		delay = 40;
+	}
+
+	endTick = xTaskGetTickCount();
+	diffTick = endTick - startTick;
+	ESP_LOGI(__FUNCTION__, "elapsed time[ms]:%"PRIu32,diffTick*portTICK_PERIOD_MS);
+	return diffTick;
+}
+
+TickType_t CursorTest(TFT_t * dev, FontxFile *fx, int width, int height) {
+	TickType_t startTick, endTick, diffTick;
+	startTick = xTaskGetTickCount();
+
+	// get font width & height
+	uint8_t fontWidth;
+	uint8_t fontHeight;
+	GetFontx(fx, 0, &fontWidth, &fontHeight);
+	//ESP_LOGI(__FUNCTION__,"fontWidth=%d fontHeight=%d",fontWidth,fontHeight);
+	uint8_t xmoji = width / fontWidth;
+	uint8_t ymoji = height / fontHeight;
+	//ESP_LOGI(__FUNCTION__,"xmoji=%d ymoji=%d",xmoji, ymoji);
+
+	uint16_t color;
+	lcdFillScreen(dev, BLACK);
+	uint8_t code;
+
+	color = CYAN;
+	lcdSetFontDirection(dev, 0);
+	code = 0x41;
+	int ynext = 0;
+	for(int y=0;y<ymoji;y++) {
+		ynext = y;
+		uint16_t xpos = 0;
+		uint16_t ypos = fontHeight*(y+1)-1;
+		for(int x=0;x<xmoji;x++) {
+			xpos = lcdDrawCode(dev, fx, xpos, ypos, code, color);
+			if (code == 0x5A) break;
+			code++;
+		}
+		if (code == 0x5A) break;
+	}
+
+	code = 0x61;
+	for(int y=ynext+1;y<ymoji;y++) {
+		uint16_t xpos = 0;
+		uint16_t ypos = fontHeight*(y+1)-1;
+		for(int x=0;x<xmoji;x++) {
+			xpos = lcdDrawCode(dev, fx, xpos, ypos, code, color);
+			if (code == 0x7A) break;
+			code++;
+		}
+		if (code == 0x7A) break;
+	}
+	lcdDrawFinish(dev);
+
+	int x_position[10] = {7,  4, 11, 11, 14,  7, 14,  2, 11,  3};
+	int y_position[10] = {0,  2,  2,  2,  2,  1,  2,  3,  2,  2};
+	char ascii_code[10] = {'H', 'e', 'l', 'l', 'o', 'W', 'o', 'r', 'l', 'd'};
+	uint8_t ascii[20];
+	memset(ascii, 0x00, sizeof(ascii));
+	for (int i=0;i<10;i++) {
+		uint16_t x_pos = x_position[i] * fontWidth;
+		uint16_t y_pos = y_position[i] * fontHeight;
+		lcdInversionArea(dev, x_pos, y_pos, x_pos+fontWidth-1, y_pos+fontHeight-1, NULL);
+		ascii[i] = ascii_code[i];
+		uint16_t color = RED;
+		lcdSetFontUnderLine(dev, color);
+		lcdDrawString(dev, fx, 0, CONFIG_HEIGHT-fontHeight, ascii, color);
+		lcdUnsetFontUnderLine(dev);
+		lcdDrawFinish(dev);
+		vTaskDelay(100);
+		lcdInversionArea(dev, x_pos, y_pos, x_pos+fontWidth-1, y_pos+fontHeight-1, NULL);
+		lcdDrawFinish(dev);
+		vTaskDelay(10);
+	}
+
+	endTick = xTaskGetTickCount();
+	diffTick = endTick - startTick;
+	ESP_LOGI(__FUNCTION__, "elapsed time[ms]:%"PRIu32,diffTick*portTICK_PERIOD_MS);
+	return diffTick;
+}
+
 void tft(void *pvParameters)
 {
 	ESP_LOGI(TAG, "Start");
-#if CONFIG_M5STICK_C_PLUS
-	// power on
-	AXP192_PowerOn();
-	AXP192_ScreenBreath(11);
-#endif
-
-#if CONFIG_M5STICK_C_PLUS2
-	// power hold
-	#define POWER_HOLD_GPIO 4
-	gpio_reset_pin( POWER_HOLD_GPIO );
-	gpio_set_direction( POWER_HOLD_GPIO, GPIO_MODE_OUTPUT );
-	gpio_set_level( POWER_HOLD_GPIO, 1 );
-	// Enable SGM2578. VLED is supplied by SGM2578
-	#define SGM2578_ENABLE_GPIO 27
-	sgm2578_Enable(SGM2578_ENABLE_GPIO);
-#endif
-
 	// set font file
 	FontxFile fx16G[2];
 	FontxFile fx24G[2];
@@ -1009,7 +1330,8 @@ void tft(void *pvParameters)
 	
 	TFT_t dev;
 	spi_master_init(&dev, CONFIG_MOSI_GPIO, CONFIG_SCLK_GPIO, CONFIG_CS_GPIO, CONFIG_DC_GPIO, CONFIG_RESET_GPIO, CONFIG_BL_GPIO);
-	lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY, true);
+	lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY);
+	lcdEnableFrameBuffer(&dev);
 
 #if CONFIG_INVERSION
 	ESP_LOGI(TAG, "Enable Display Inversion");
@@ -1050,7 +1372,7 @@ void tft(void *pvParameters)
 		RoundRectTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
 
-		if (dev._use_frame_buffer == false) {
+		if (lcdIsFrameBuffer(&dev) == false) {
 			RectAngleTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
 			WAIT;
 
@@ -1097,6 +1419,24 @@ void tft(void *pvParameters)
 		strcpy(file, "/images/esp_logo.png");
 		PNGTest(&dev, file, CONFIG_WIDTH, CONFIG_HEIGHT);
 		WAIT;
+
+		if (lcdIsFrameBuffer(&dev) == true) {
+			WrapArroundTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
+			WAIT;
+
+			ImageMoveTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
+			WAIT;
+
+			ImageInversionTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
+			WAIT;
+
+#if 0
+			CursorTest(&dev, fx32G, CONFIG_WIDTH, CONFIG_HEIGHT);
+			WAIT;
+#endif
+			TextBoxTest(&dev, fx32G, CONFIG_WIDTH, CONFIG_HEIGHT);
+			WAIT;
+		}
 
 		lcdFillScreen(&dev, WHITE);
 		strcpy(file, "/icons/twitter.png");
@@ -1247,8 +1587,21 @@ void app_main(void)
 	listSPIFFS("/icons");
 
 #if CONFIG_M5STICK_C_PLUS
-	// Initialize i2c
-	i2c_master_init();
+	// Power on the AXP192
+	AXP192_Initialize(I2C_NUM_0);
+	AXP192_PowerOn();
+	AXP192_ScreenBreath(11);
+#endif
+
+#if CONFIG_M5STICK_C_PLUS2
+	// Power hold the SGM2578
+	#define POWER_HOLD_GPIO 4
+	gpio_reset_pin( POWER_HOLD_GPIO );
+	gpio_set_direction( POWER_HOLD_GPIO, GPIO_MODE_OUTPUT );
+	gpio_set_level( POWER_HOLD_GPIO, 1 );
+	// Enable SGM2578. VLED is supplied by SGM2578
+	#define SGM2578_ENABLE_GPIO 27
+	sgm2578_Enable(SGM2578_ENABLE_GPIO);
 #endif
 
 	// Start Task
