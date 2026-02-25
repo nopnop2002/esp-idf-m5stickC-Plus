@@ -10,12 +10,6 @@
 #include "esp_err.h"
 #include "esp_log.h"
 
-#if CONFIG_M5STICK_C_PLUS
-#include "axp192.h"
-#endif
-#if CONFIG_M5STICK_C_PLUS2
-#include "sgm2578.h"
-#endif
 #include "st7789.h"
 #include "fontx.h"
 #include "parameter.h"
@@ -83,23 +77,6 @@ typedef enum {POSE_NONE, POSE_P_X, POSE_M_X, POSE_P_Y, POSE_M_Y, POSE_P_Z, POSE_
 void tft(void *pvParameters)
 {
 	ESP_LOGI(TAG, "Start");
-#if CONFIG_M5STICK_C_PLUS
-	// power on
-	AXP192_PowerOn();
-	AXP192_ScreenBreath(11);
-#endif
-
-#if CONFIG_M5STICK_C_PLUS2
-	// power hold
-	#define POWER_HOLD_GPIO 4
-	gpio_reset_pin( POWER_HOLD_GPIO );
-	gpio_set_direction( POWER_HOLD_GPIO, GPIO_MODE_OUTPUT );
-	gpio_set_level( POWER_HOLD_GPIO, 1 );
-	// Enable SGM2578. VLED is supplied by SGM2578
-	#define SGM2578_ENABLE_GPIO 27
-	sgm2578_Enable(SGM2578_ENABLE_GPIO);
-#endif
-
 	// set font file
 	FontxFile fx16G[2];
 	FontxFile fx24G[2];
@@ -117,18 +94,19 @@ void tft(void *pvParameters)
 	
 	TFT_t dev;
 	spi_master_init(&dev, CONFIG_MOSI_GPIO, CONFIG_SCLK_GPIO, CONFIG_CS_GPIO, CONFIG_DC_GPIO, CONFIG_RESET_GPIO, CONFIG_BL_GPIO);
-	lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY, false);
+	lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY);
+	lcdEnableFrameBuffer(&dev);
 
 	int width = CONFIG_WIDTH;
 	int height = CONFIG_HEIGHT;
 	ESP_LOGI(TAG, "width=%d height=%d", width, height);
 
 	// Get font width & height
-    uint8_t buffer[FontxGlyphBufSize];
-    uint8_t fontWidth;
-    uint8_t fontHeight;
-    //GetFontx(fx24G, 0, buffer, &fontWidth, &fontHeight);
-    GetFontx(fx32G, 0, buffer, &fontWidth, &fontHeight);
+	//uint8_t buffer[FontxGlyphBufSize];
+	uint8_t fontWidth;
+	uint8_t fontHeight;
+	//GetFontx(fx24G, 0, buffer, &fontWidth, &fontHeight);
+	GetFontx(fx32G, 0, &fontWidth, &fontHeight);
 	ESP_LOGI(TAG, "fontWidth=%d fontHeight=%d",fontWidth,fontHeight);
 
 	// The unit of value that can be obtained by the acceleration sensor is [g], so convert it to [m/s^2].
@@ -180,6 +158,7 @@ void tft(void *pvParameters)
 					xpos = width - fontHeight;
 					ypos = (height/2) - (fontWidth/2);
 					lcdDrawString(&dev, fx32G, xpos, ypos, ascii, RED);
+					lcdDrawFinish(&dev);
 				} else if (pose == POSE_M_X) {
 					ESP_LOGI(TAG, "-X");
 					lcdFillScreen(&dev, BLACK);
@@ -188,6 +167,7 @@ void tft(void *pvParameters)
 					xpos = fontHeight-1;
 					ypos = (height/2) + fontWidth;
 					lcdDrawString(&dev, fx32G, xpos, ypos, ascii, CYAN);
+					lcdDrawFinish(&dev);
 				} else if (pose == POSE_P_Y) {
 					ESP_LOGI(TAG, "+Y");
 					lcdFillScreen(&dev, BLACK);
@@ -196,6 +176,7 @@ void tft(void *pvParameters)
 					xpos = (width/2) - fontWidth;
 					ypos = fontHeight-1;
 					lcdDrawString(&dev, fx32G, xpos, ypos, ascii, RED);
+					lcdDrawFinish(&dev);
 				} else if (pose == POSE_M_Y) {
 					ESP_LOGI(TAG, "-Y");
 					lcdFillScreen(&dev, BLACK);
@@ -204,6 +185,7 @@ void tft(void *pvParameters)
 					xpos = (width/2) + fontWidth;
 					ypos = height - fontHeight-1;
 					lcdDrawString(&dev, fx32G, xpos, ypos, ascii, CYAN);
+					lcdDrawFinish(&dev);
 				} else if (pose == POSE_P_Z) {
 					ESP_LOGI(TAG, "+Z");
 					lcdFillScreen(&dev, BLACK);
@@ -212,6 +194,7 @@ void tft(void *pvParameters)
 					xpos = (width/2) - (fontHeight/2);
 					ypos = (height/2) - (fontWidth/2);
 					lcdDrawString(&dev, fx32G, xpos, ypos, ascii, RED);
+					lcdDrawFinish(&dev);
 				} else if (pose == POSE_M_Z) {
 					ESP_LOGI(TAG, "-Z");
 					lcdFillScreen(&dev, BLACK);
@@ -220,8 +203,10 @@ void tft(void *pvParameters)
 					xpos = (width/2) - (fontHeight/2);
 					ypos = (height/2) - (fontWidth/2);
 					lcdDrawString(&dev, fx32G, xpos, ypos, ascii, CYAN);
+					lcdDrawFinish(&dev);
 				} else {
 					lcdFillScreen(&dev, BLACK);
+					lcdDrawFinish(&dev);
 				}
 				prev_pose = pose;
 			} // from imu
