@@ -6,7 +6,8 @@ I used [this](https://github.com/jrowberg/i2cdevlib/tree/master/Arduino) I2Cdev 
 ![pose-2](https://github.com/nopnop2002/esp-idf-m5stickC-Plus/assets/6020549/3f06eb43-eead-4901-9e16-3b3e39266867)
 
 # Software requirements
-esp-idf v4.4/v5.x.   
+ESP-IDF V5.2 or later.   
+Because this project uses the new I2C driver.   
 
 # Installation
 ```
