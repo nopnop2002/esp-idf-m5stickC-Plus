@@ -6,6 +6,9 @@ M5StickC-Plus/Plus2 has 135x240 ST7789V2 tft.
 
 StickC-Plus Schematic PDF is [here](https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/669/k016-p-StickC-Plus-sche.pdf).   
 StickC-Plus2 Schematics PDF is [here](https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/512/Sch_M5StickC_Plus2_v0.5.pdf).   
+Both are equipped with the MPU-6886.   
+The MPU-6886 uses an I2C interface.   
+SYS_SDA is IO21 and SYS_SCL is IO22.   
 
 # Software requirements
 esp-idf v4.4/v5.x.   
