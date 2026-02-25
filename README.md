@@ -4,6 +4,9 @@ M5StickC-Plus/Plus2 has 135x240 ST7789V2 tft.
 
 ![M5StickC-Plus2](https://github.com/nopnop2002/esp-idf-m5stickC-Plus/assets/6020549/ca0e2687-a557-40b5-b712-5f3f578ddf75)
 
+StickC-Plus Schematic PDF is [here](https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/669/k016-p-StickC-Plus-sche.pdf).   
+StickC-Plus2 Schematics PDF is [here](https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/512/Sch_M5StickC_Plus2_v0.5.pdf).   
+
 # Software requirements
 esp-idf v4.4/v5.x.   
 
